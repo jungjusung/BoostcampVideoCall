@@ -1,15 +1,8 @@
 package android.boostcamp.com.boostcampvideocall;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.content.Context;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.PhoneNumberUtils;
-import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -50,7 +43,7 @@ public class DefaultActivity extends AppCompatActivity {
             String token=datas[1];
             String phoneNumber=datas[2];
             String url="http://1-dot-boostcamp-jusung.appspot.com/boostcamp_selectOne";
-            UtillGAE.requestMemberGAE(name,token,phoneNumber,url);
+            Utill.requestMemberGAE(name,token,phoneNumber,url);
             return null;
         }
     }

@@ -28,7 +28,9 @@ public class SplashActivity extends AppCompatActivity {
     private Realm realm;
     private ShimmerFrameLayout logoText;
     private Thread animationThread;
+
     private int infoSize;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

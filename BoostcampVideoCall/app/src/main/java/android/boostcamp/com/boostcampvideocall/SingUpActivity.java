@@ -1,6 +1,8 @@
 package android.boostcamp.com.boostcampvideocall;
 
+import android.boostcamp.com.boostcampvideocall.DB.MyInfo;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +17,8 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -31,19 +35,23 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
     private EditText mEditName, mEditPhone;
     private Button mRegistBtn;
     private Realm realm;
+    private String token;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        token = FirebaseInstanceId.getInstance().getToken();
+
+
         mEditName = (EditText) findViewById(R.id.et_name);
         mEditPhone = (EditText) findViewById(R.id.et_phone);
 
         mEditName.setMaxLines(1);
-        mEditName.setFilters(new InputFilter[]{filterName,new InputFilter.LengthFilter(25)});
+        mEditName.setFilters(new InputFilter[]{Utill.filterAlphaKor,new InputFilter.LengthFilter(25)});
         mEditName.setRawInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         mEditPhone.setMaxWidth(11);
-        mEditPhone.setFilters(new InputFilter[]{filterNum,new InputFilter.LengthFilter(11)});
+        mEditPhone.setFilters(new InputFilter[]{Utill.filterNum,new InputFilter.LengthFilter(11)});
         mEditPhone.setRawInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         mRegistBtn = (Button) findViewById(R.id.bt_regist);
         mRegistBtn.setOnClickListener(this);
@@ -71,49 +79,55 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
         }
         return valiedNumber;
     }
-
-    public void showAlert(String title,String context,String btn){
-        Toast.makeText(this,"경고 : "+title+"\ncontext : "+context, Toast.LENGTH_SHORT).show();
-    }
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.bt_regist) {
             String name = mEditName.getText().toString();
-            String myNumber = mEditPhone.getText().toString();
+            String phoneNumber = mEditPhone.getText().toString();
             if(name.equals("")){
-                showAlert("경고","사용자의 이름을 입력 하세요.","확인");
+                Toast.makeText(this, "사용자의 이름을 입력 하세요.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(myNumber.equals("")){
-                showAlert("경고","사용자의 연락처를 입력 하세요.","확인");
+            if(phoneNumber.equals("")){
+                Toast.makeText(this, "연락처를 입력해주세요.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            myNumber = editPhoneNumberValid(myNumber);
-            Toast.makeText(this, myNumber, Toast.LENGTH_SHORT).show();
+            phoneNumber = editPhoneNumberValid(phoneNumber);
+            insertToRealmInfo(name,phoneNumber,token);
+            insertDB(name,phoneNumber,token);
+            Toast.makeText(this, "서버 저장 완료", Toast.LENGTH_SHORT).show();
+
         }
     }
+    public void insertToRealmInfo(String name,String phoneNumber,String token){
+        realm=Realm.getDefaultInstance();
+        MyInfo info=new MyInfo();
+        realm.beginTransaction();
+        info.setName(name);
+        info.setPhoneNumber(phoneNumber);
+        info.setToken(token);
+        realm.insert(info);
+        realm.commitTransaction();
+    }
+    public void insertDB(String name,String phoneNumber,String token){
+        new InsertDBAsyncTask().execute(name,phoneNumber,token);
+    }
+    private class InsertDBAsyncTask extends AsyncTask<String,Void,Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
 
-    public InputFilter filterNum = new InputFilter() {
-        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-            Pattern ps = Pattern.compile("^[0-9]*$");
-            if (!ps.matcher(source).matches()) {
-                return "";
-            }
+        @Override
+        protected Void doInBackground(String... datas) {
+            String name=datas[0];
+            String phoneNumber=datas[1];
+            String token=datas[2];
+            String url="http://1-dot-boostcamp-jusung.appspot.com/boostcamp_DB";
+            Utill.registMemberInfo(name,phoneNumber,token,url);
             return null;
         }
-    };
-    public InputFilter filterName = new InputFilter() {
-        public CharSequence filter(CharSequence source, int start, int end,
-                                   Spanned dest, int dstart, int dend) {
-
-            Pattern ps = Pattern.compile("^[a-zA-Zㄱ-가-힣]*$");
-
-            if (!ps.matcher(source).matches()) {
-                return "";
-            }
-            return null;
-        }
-    };
+    }
 
 }
