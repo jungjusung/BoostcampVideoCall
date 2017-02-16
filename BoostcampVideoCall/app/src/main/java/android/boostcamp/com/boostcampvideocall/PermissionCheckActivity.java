@@ -23,21 +23,6 @@ import java.util.ArrayList;
 
 public class PermissionCheckActivity extends AppCompatActivity {
 
-    public static final String[] MANDATORY_PERMISSIONS = {
-            "android.permission.INTERNET",
-            "android.permission.CAMERA",
-            "android.permission.RECORD_AUDIO",
-            "android.permission.MODIFY_AUDIO_SETTINGS",
-            "android.permission.ACCESS_NETWORK_STATE",
-            "android.permission.CHANGE_WIFI_STATE",
-            "android.permission.ACCESS_WIFI_STATE",
-            "android.permission.READ_PHONE_STATE",
-            "android.permission.BLUETOOTH",
-            "android.permission.BLUETOOTH_ADMIN",
-            "android.permission.WRITE_EXTERNAL_STORAGE"
-    };
-
-
     private final String TAG = "PermissionCheckActivity";
 
     // 해당 액티비티에서 권한 설정
@@ -46,6 +31,15 @@ public class PermissionCheckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_permission);
 
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            checkPermission();
+        } else {
+            permissionsGranted();
+        }
+    }
+
+
+    public void checkPermission() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -58,8 +52,6 @@ public class PermissionCheckActivity extends AppCompatActivity {
                 finish();
             }
         };
-
-
         new TedPermission(this)
                 .setPermissionListener(permissionlistener)
                 .setDeniedMessage("해당 앱을 사용하려면 권한이 필요합니다.\n\n설정 버튼을 눌러, 권한을 확인해주세요.")
@@ -67,13 +59,16 @@ public class PermissionCheckActivity extends AppCompatActivity {
                         Manifest.permission.CAMERA,
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.READ_PHONE_STATE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        )
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.GET_ACCOUNTS,
+                        Manifest.permission.READ_CONTACTS,
+                        Manifest.permission.WRITE_CONTACTS)
                 .check();
     }
 
+
     public void permissionsGranted() {
-        Intent intent = new Intent(this, DefaultActivity.class);
+        Intent intent = new Intent(this, SplashActivity.class);
         startActivity(intent);
         finish();
     }
