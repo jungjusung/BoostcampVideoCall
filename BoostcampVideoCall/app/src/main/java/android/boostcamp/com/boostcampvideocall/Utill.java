@@ -70,7 +70,6 @@ public class Utill {
 
             BufferedWriter buffw=new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
             buffw.write("name="+name+"&token="+token+"&phoneNumber="+phoneNumber);
-            buffw.write("\n");
             buffw.flush();
 
             con.getResponseCode();
@@ -82,4 +81,5 @@ public class Utill {
             e.printStackTrace();
         }
     }
+
 }

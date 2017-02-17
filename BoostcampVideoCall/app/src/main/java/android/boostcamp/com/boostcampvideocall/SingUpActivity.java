@@ -2,6 +2,7 @@ package android.boostcamp.com.boostcampvideocall;
 
 import android.boostcamp.com.boostcampvideocall.DB.MyInfo;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,19 +12,12 @@ import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.text.Spanned;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.firebase.iid.FirebaseInstanceId;
-
 import java.util.Locale;
-import java.util.regex.Pattern;
-
-
 import io.realm.Realm;
 
 /**
@@ -96,8 +90,6 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
             phoneNumber = editPhoneNumberValid(phoneNumber);
             insertToRealmInfo(name,phoneNumber,token);
             insertDB(name,phoneNumber,token);
-            Toast.makeText(this, "서버 저장 완료", Toast.LENGTH_SHORT).show();
-
         }
     }
     public void insertToRealmInfo(String name,String phoneNumber,String token){
@@ -127,6 +119,12 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
             String url="http://1-dot-boostcamp-jusung.appspot.com/boostcamp_DB";
             Utill.registMemberInfo(name,phoneNumber,token,url);
             return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Intent intent=new Intent(getApplicationContext(),MainActivity.class);
+            startActivity(intent);
         }
     }
 

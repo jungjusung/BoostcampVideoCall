@@ -10,40 +10,40 @@ import io.realm.annotations.PrimaryKey;
 public class Member extends RealmObject{
 
     @PrimaryKey
-    private int member_id;
-    private String member_name;
-    private String member_phoneNumber;
-    private String member_token;
+    private int id;
+    private String name;
+    private String phoneNumber;
+    private String token;
 
-    public int getMember_id() {
-        return member_id;
+    public int getId() {
+        return id;
     }
 
-    public void setMember_id(int member_id) {
-        this.member_id = member_id;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getMember_name() {
-        return member_name;
+    public String getName() {
+        return name;
     }
 
-    public void setMember_name(String member_name) {
-        this.member_name = member_name;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getMember_phoneNumber() {
-        return member_phoneNumber;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setMember_phoneNumber(String member_phoneNumber) {
-        this.member_phoneNumber = member_phoneNumber;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
-    public String getMember_token() {
-        return member_token;
+    public String getToken() {
+        return token;
     }
 
-    public void setMember_token(String member_token) {
-        this.member_token = member_token;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

@@ -55,8 +55,9 @@
         <activity
             android:name=".SplashActivity"
             android:theme="@style/myNoActionBar" />
-        <activity android:name=".DefaultActivity" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity"
+            android:theme="@style/myNoActionBar"
+            />
         <activity android:name=".SingUpActivity"
             android:theme="@style/myNoActionBar"
             android:windowSoftInputMode="adjustUnspecified"
