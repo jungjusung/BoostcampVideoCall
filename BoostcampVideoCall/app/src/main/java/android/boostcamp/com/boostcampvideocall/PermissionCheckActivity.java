@@ -28,6 +28,7 @@ public class PermissionCheckActivity extends AppCompatActivity {
     // 해당 액티비티에서 권한 설정
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_permission);
 

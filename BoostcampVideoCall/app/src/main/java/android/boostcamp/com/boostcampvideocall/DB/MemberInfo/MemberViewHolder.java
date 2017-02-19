@@ -1,8 +1,10 @@
-package android.boostcamp.com.boostcampvideocall.DB.MemberInfo;
+package android.boostcamp.com.boostcampvideocall.db.memberinfo;
 
-import android.boostcamp.com.boostcampvideocall.DB.Member;
+import android.boostcamp.com.boostcampvideocall.VideoCallActvity;
+import android.boostcamp.com.boostcampvideocall.db.Member;
 import android.boostcamp.com.boostcampvideocall.R;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,12 +33,19 @@ public class MemberViewHolder extends RecyclerView.ViewHolder implements View.On
     public void onClick(View view) {
         final int clickedPosition = getAdapterPosition();
         mOnClickListener.onListItemClick(clickedPosition);
+        mList = realm.where(Member.class).findAll();
+        Member member=mList.get(clickedPosition);
         switch (view.getId()){
             case R.id.tv_info:
                 Toast.makeText(context,clickedPosition+"인포", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.tv_videocall:
-                Toast.makeText(context,clickedPosition+"영상통화전화", Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(context, VideoCallActvity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("name",member.getName());
+                intent.putExtra("phoneNumber",member.getPhoneNumber());
+                intent.putExtra("token",member.getToken());
+                context.startActivity(intent);
                 break;
         }
 

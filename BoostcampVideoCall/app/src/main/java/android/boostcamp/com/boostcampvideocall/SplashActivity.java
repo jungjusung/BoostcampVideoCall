@@ -1,9 +1,9 @@
 package android.boostcamp.com.boostcampvideocall;
 
 import android.animation.ObjectAnimator;
-import android.boostcamp.com.boostcampvideocall.DB.Member;
-import android.boostcamp.com.boostcampvideocall.DB.MemberService;
-import android.boostcamp.com.boostcampvideocall.DB.MyInfo;
+import android.boostcamp.com.boostcampvideocall.db.Member;
+import android.boostcamp.com.boostcampvideocall.db.MemberService;
+import android.boostcamp.com.boostcampvideocall.db.MyInfo;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 
@@ -41,6 +40,7 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         logoText = (ShimmerFrameLayout) findViewById(R.id.shimmer_text);

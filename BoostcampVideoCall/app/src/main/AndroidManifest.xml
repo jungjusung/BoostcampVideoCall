@@ -45,23 +45,18 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PermissionCheckActivity"
-            android:theme="@style/myNoActionBar">
+        <activity android:name=".PermissionCheckActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SplashActivity" />
+        <activity android:name=".MainActivity" />
         <activity
-            android:name=".SplashActivity"
-            android:theme="@style/myNoActionBar" />
-        <activity android:name=".MainActivity"
-            android:theme="@style/myNoActionBar"
-            />
-        <activity android:name=".SingUpActivity"
-            android:theme="@style/myNoActionBar"
-            android:windowSoftInputMode="adjustUnspecified"
-            />
+            android:name=".SingUpActivity"
+            android:windowSoftInputMode="adjustUnspecified" />
+        <activity android:name=".VideoCallActvity"/>
 
         <service android:name=".MyFirebaseMessagingService">
             <intent-filter>

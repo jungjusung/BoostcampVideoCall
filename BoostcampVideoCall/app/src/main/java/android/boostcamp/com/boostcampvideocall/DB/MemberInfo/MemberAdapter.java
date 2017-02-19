@@ -1,14 +1,11 @@
-package android.boostcamp.com.boostcampvideocall.DB.MemberInfo;
+package android.boostcamp.com.boostcampvideocall.db.memberinfo;
 
-import android.boostcamp.com.boostcampvideocall.MainActivity;
 import android.boostcamp.com.boostcampvideocall.R;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.List;
 
 /**
  * Created by Jusung on 2017. 2. 17..

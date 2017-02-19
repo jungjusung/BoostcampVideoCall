@@ -1,6 +1,6 @@
 package android.boostcamp.com.boostcampvideocall;
 
-import android.boostcamp.com.boostcampvideocall.DB.MyInfo;
+import android.boostcamp.com.boostcampvideocall.db.MyInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -33,6 +33,7 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         token = FirebaseInstanceId.getInstance().getToken();
@@ -54,8 +55,10 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
     public void editTextSetting() {
         TelephonyManager tManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         String myNumber = tManager.getLine1Number();
-        if (myNumber != null && !myNumber.equals("")) {
-            myNumber = editPhoneNumberValid(myNumber);
+        if (myNumber != null &&!myNumber.equals("")) {
+            myNumber = myNumber.replace("+82","0");
+            myNumber=myNumber.replace("-","");
+
             mEditPhone.setText(myNumber);
             mEditPhone.setClickable(false);
             mEditPhone.setEnabled(false);

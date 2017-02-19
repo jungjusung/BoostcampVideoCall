@@ -1,4 +1,4 @@
-package android.boostcamp.com.boostcampvideocall.DB;
+package android.boostcamp.com.boostcampvideocall.db;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

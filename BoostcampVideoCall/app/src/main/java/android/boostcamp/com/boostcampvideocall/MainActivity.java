@@ -1,7 +1,7 @@
 package android.boostcamp.com.boostcampvideocall;
 
-import android.boostcamp.com.boostcampvideocall.DB.Member;
-import android.boostcamp.com.boostcampvideocall.DB.MemberInfo.MemberAdapter;
+import android.boostcamp.com.boostcampvideocall.db.Member;
+import android.boostcamp.com.boostcampvideocall.db.memberinfo.MemberAdapter;
 import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -12,15 +12,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
-
-
 import devlight.io.library.ntb.NavigationTabBar;
 import io.realm.Realm;
+
 
 
 public class MainActivity extends AppCompatActivity implements MemberAdapter.ListItemClickListener{
@@ -37,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         realm = Realm.getDefaultInstance();
@@ -106,9 +103,7 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
         }
         navigationTabBar.setModels(models);
         navigationTabBar.setViewPager(mViewPager, 0);
-
         navigationTabBar.setBehaviorEnabled(true);
-
         navigationTabBar.setOnTabBarSelectedIndexListener(new NavigationTabBar.OnTabBarSelectedIndexListener() {
             @Override
             public void onStartTabSelected(final NavigationTabBar.Model model, final int index) {
@@ -136,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
         });
 
     }
-
     @Override
     public void onListItemClick(int clickedItemIndex) {
 
