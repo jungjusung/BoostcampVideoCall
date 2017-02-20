@@ -1,18 +1,31 @@
 package android.boostcamp.com.boostcampvideocall;
 
 import android.animation.ObjectAnimator;
+
 import android.boostcamp.com.boostcampvideocall.db.MyInfo;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.google.android.gms.common.images.Size;
+import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.MultiProcessor;
+import com.google.android.gms.vision.Tracker;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
 import com.sktelecom.playrtc.PlayRTC;
 import com.sktelecom.playrtc.PlayRTCFactory;
 import com.sktelecom.playrtc.config.PlayRTCConfig;
@@ -29,6 +42,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -37,10 +56,10 @@ import io.realm.Realm;
  * Created by Jusung on 2017. 2. 18..
  */
 
-public class VideoCallActvity extends AppCompatActivity {
+public class VideoCallActvity extends AppCompatActivity implements View.OnClickListener{
 
 
-    String TAG;
+    public static String TAG;
     private static final String KEY = "60ba608a-e228-4530-8711-fa38004719c1";
     private PlayRTCObserver playrtcObserver = null;
     private PlayRTC playrtc = null;
@@ -52,8 +71,15 @@ public class VideoCallActvity extends AppCompatActivity {
     private String mToken;
     private String mName;
     private String mPhoneNumber;
+    private String mChannelId;
     private Realm mRealm;
     private ShimmerFrameLayout mEndCall;
+
+    private Context mContext;
+    private WindowManager mWidnowMnager;
+
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(R.style.myNoActionBar);
@@ -61,20 +87,27 @@ public class VideoCallActvity extends AppCompatActivity {
         TAG = this.getClass().getName();
         setContentView(R.layout.activity_videocall_send);
 
+        mContext=getApplication();
         mEndCall = (ShimmerFrameLayout) findViewById(R.id.shimmer_end_call);
         mEndCall.setDuration(2000);
         mEndCall.setRepeatMode(ObjectAnimator.REVERSE);
         mEndCall.bringToFront();
+        mEndCall.setOnClickListener(this);
 
         Intent intent = this.getIntent();
         mName = intent.getStringExtra("name");
         mToken = intent.getStringExtra("token");
         mPhoneNumber = intent.getStringExtra("phoneNumber");
-        mRealm=Realm.getDefaultInstance();
-        MyInfo myInfo=mRealm.where(MyInfo.class).findFirst();
+        mRealm = Realm.getDefaultInstance();
+
+        MyInfo myInfo = mRealm.where(MyInfo.class).findFirst();
+        Log.d(TAG,"비디오뷰생성");
         createPlayRTCInstance();
         createChannel(myInfo.getToken());
     }
+
+
+
 
     private void createPlayRTCInstance() {
         try {
@@ -84,6 +117,7 @@ public class VideoCallActvity extends AppCompatActivity {
             //옵저버 생성
 
             playrtc = PlayRTCFactory.createPlayRTC(setting, playrtcObserver);
+            Log.d(TAG,playrtc.toString());
             Log.d(TAG, "playrtc생성");
             //플레이 rtc객체 생성
 
@@ -121,9 +155,9 @@ public class VideoCallActvity extends AppCompatActivity {
             @Override
             public void onConnectChannel(PlayRTC playRTC, String channelId, String reason) {
                 super.onConnectChannel(playRTC, channelId, reason);
-
-                if (reason.equals("create"))
-                    callToPeer(channelId);
+                mChannelId=channelId;
+                callToPeer(channelId);
+                Log.d(TAG,"id"+channelId);
             }
 
             @Override
@@ -134,6 +168,15 @@ public class VideoCallActvity extends AppCompatActivity {
                 Toast.makeText(VideoCallActvity.this, "로컬", Toast.LENGTH_SHORT).show();
                 // Link the media stream to the view.
                 playRTCMedia.setVideoRenderer(localView.getVideoRenderer());
+
+                RelativeLayout myVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
+                if(localView!=null) {
+
+                    //애니메이션 효과 있을시
+                    //FaceTrackerThread thread = new FaceTrackerThread(localView, remoteView, mContext, myVideoViewGroup);
+                    //thread.start();
+                }
+                localView.getHolder().addCallback(new SurfaceCallback());
             }
 
             @Override
@@ -148,13 +191,16 @@ public class VideoCallActvity extends AppCompatActivity {
 
             @Override
             public void onDisconnectChannel(PlayRTC playRTC, String s) {
+                finish();
                 if (playrtc != null) {
                     playrtc.close();
+
                 }
             }
 
             @Override
             public void onOtherDisconnectChannel(PlayRTC playRTC, String s, String s1) {
+                finish();
                 if (playrtc != null) {
                     playrtc.close();
                 }
@@ -185,7 +231,6 @@ public class VideoCallActvity extends AppCompatActivity {
             Point myVideoSize = new Point();
             myVideoSize.x = parentViewDimensions.x;
             myVideoSize.y = parentViewDimensions.y;
-
 
 
             RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -246,7 +291,7 @@ public class VideoCallActvity extends AppCompatActivity {
             JSONObject channel = new JSONObject();
 
             try {
-                channel.put("channelName", name);
+                channel.put("channelName", "");
                 parameters.put("channel", channel);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -256,6 +301,7 @@ public class VideoCallActvity extends AppCompatActivity {
             // 채널 사용자에 대한 정보를 정의한다.
             JSONObject peer = new JSONObject();
             try {
+                peer.put("uid", "");
                 parameters.put("peer", peer);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -274,16 +320,20 @@ public class VideoCallActvity extends AppCompatActivity {
     }
 
     public void callToPeer(String channelId) {
+        Toast.makeText(mContext, "전화걸기!!", Toast.LENGTH_SHORT).show();
         String name = mName;
         String token = mToken;
         String phoneNumber = mPhoneNumber;
         String channel = channelId;
+
+        Toast.makeText(mContext,token, Toast.LENGTH_SHORT).show();
         sendFcmInDevice(name, token, phoneNumber, channel);
     }
 
     public void sendFcmInDevice(String name, String token, String phoneNumber, String channelId) {
         new SendFcmAsyncTask().execute(name, token, phoneNumber, channelId);
     }
+
 
     private class SendFcmAsyncTask extends AsyncTask<String, Void, Void> {
         @Override
@@ -292,19 +342,80 @@ public class VideoCallActvity extends AppCompatActivity {
             String token = datas[1];
             String phoneNumber = datas[2];
             String channelID = datas[3];
-            String url = "http://1-dot-boostcamp-jusung.appspot.com/boostcamp_fcm";
-            Utill.requestFCM(name, token, phoneNumber, url, channelID);
+            Log.d(TAG,"Fcm"+channelID);
+            String url = "http://1-dot-boostcamp-jusung.appspot.com/boostcampFCM";
+            requestFCM(name, token, phoneNumber, url, channelID);
             return null;
         }
     }
+
     public void onResume() {
         super.onResume();
         mEndCall.startShimmerAnimation();
     }
+
     @Override
     public void onPause() {
         super.onPause();
         mEndCall.stopShimmerAnimation();
     }
 
+    @Override
+    public void onBackPressed() {
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId()==R.id.shimmer_end_call){
+            playrtc.deleteChannel();
+            finish();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(playrtc!=null){
+            playrtc.close();
+        }
+    }
+    private class SurfaceCallback implements SurfaceHolder.Callback {
+        @Override
+        public void surfaceCreated(SurfaceHolder surfaceHolder) {
+            Log.d(TAG,"생성됨");
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+            Log.d(TAG,"변경됨");
+
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+        }
+    }
+    public static void requestFCM(String name, String token, String phoneNumber,String urlString,String channelId) {
+
+        try{
+            URL url = new URL(urlString);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setDoInput(true);
+            con.setDoOutput(true);
+
+            BufferedWriter buffw=new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+            buffw.write("name="+name+"&token="+token+"&phoneNumber="+phoneNumber+"&channelId="+channelId);
+            buffw.flush();
+            Log.d(TAG,"name="+name+"&token="+token+"&phoneNumber="+phoneNumber+"&channelId="+channelId);
+            con.getResponseCode();
+            con.disconnect();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

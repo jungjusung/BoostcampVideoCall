@@ -119,7 +119,7 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
             String name=datas[0];
             String phoneNumber=datas[1];
             String token=datas[2];
-            String url="http://1-dot-boostcamp-jusung.appspot.com/boostcamp_DB";
+            String url="http://1-dot-boostcamp-jusung.appspot.com/boostcampDB";
             Utill.registMemberInfo(name,phoneNumber,token,url);
             return null;
         }

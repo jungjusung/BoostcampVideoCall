@@ -10,6 +10,6 @@ import retrofit2.http.GET;
  */
 
 public interface MemberService {
-    @GET("/boostcamp_selectAll")
+    @GET("/boostcampSelectAll")
     Call<List<Member>> listMember();
 }

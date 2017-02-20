@@ -3,4 +3,5 @@
     <string name="app_title">FaceStory</string>
     <string name="sign_up_info">Regist your info</string>
     <string name="title">FaceStory</string>
+    <string name="receive_message">수신중..</string>
 </resources>

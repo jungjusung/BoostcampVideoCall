@@ -18,30 +18,30 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-//        Map<String, String> data = remoteMessage.getData();
-//        Intent intent=new Intent(this.getApplicationContext(),TestActivity.class);
-//        Log.d(TAG,data.toString());
-//        String channelId=data.get("channelId");
-//        Log.d(TAG,channelId);
-//        intent.putExtra("channelId",channelId);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(), 0, intent, 0);
-//        try {
-//            pendingIntent.send();
-//        } catch (PendingIntent.CanceledException e) {
-//            e.printStackTrace();
-//        }
-//        if(data!=null){
-//            Log.d(TAG, "data = " + data);
-//        }
-//
-//        RemoteMessage.Notification noti = remoteMessage.getNotification();
-//        if(noti != null){
-//            String title = noti.getTitle();
-//            Log.d(TAG, "title = " + title);
-//
-//            String body = noti.getBody();
-//            //Toast.makeText(this, body, Toast.LENGTH_SHORT).show();
-//            Log.d(TAG, "body = " + body);
-//        }
+
+        Map<String, String> data = remoteMessage.getData();
+        Intent intent=new Intent(this.getApplicationContext(),CallReceiveActivity.class);
+
+        String channelId=data.get("channelId");
+
+        String name=data.get("name");
+        String phoneNumber=data.get("phoneNumber");
+        String token=data.get("token");
+        Log.d(TAG,channelId+" "+name+" "+phoneNumber+" ");
+        intent.putExtra("channelId",channelId);
+        intent.putExtra("name",name);
+        intent.putExtra("phoneNumber",phoneNumber);
+        intent.putExtra("token",token);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(),1000, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //startActivity(intent);
+
+        try {
+            pendingIntent.send();
+            Log.d(TAG,"pending");
+        } catch (PendingIntent.CanceledException e) {
+            Log.e(TAG,e.getMessage());
+        }
+
     }
 }

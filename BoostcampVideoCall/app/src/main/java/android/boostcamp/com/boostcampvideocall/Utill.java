@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 public class Utill {
 
+
     public static InputFilter filterNum = new InputFilter() {
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
             Pattern ps = Pattern.compile("^[0-9]*$");
@@ -51,7 +52,8 @@ public class Utill {
             BufferedWriter buffw=new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
             buffw.write("name="+name+"&token="+token+"&phoneNumber="+phoneNumber);
             buffw.flush();
-
+            String TAG="Utill";
+            Log.d(TAG,"성공");
             con.getResponseCode();
             con.disconnect();
 
@@ -62,17 +64,19 @@ public class Utill {
         }
     }
     public static void requestFCM(String name, String token, String phoneNumber,String urlString,String channelId) {
-        BufferedWriter buffw=null;
+
         try{
+            final String TAG="UTill";
             URL url = new URL(urlString);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setDoInput(true);
             con.setDoOutput(true);
 
-            buffw=new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+            BufferedWriter buffw=new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
             buffw.write("name="+name+"&token="+token+"&phoneNumber="+phoneNumber+"&channelId="+channelId);
             buffw.flush();
+            Log.d(TAG,"name="+name+"&token="+token+"&phoneNumber="+phoneNumber+"&channelId="+channelId);
             con.getResponseCode();
             con.disconnect();
 
@@ -80,14 +84,6 @@ public class Utill {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if (buffw!=null){
-                try {
-                    buffw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
