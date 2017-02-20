@@ -2,6 +2,8 @@ package android.boostcamp.com.boostcampvideocall;
 
 import android.animation.ObjectAnimator;
 
+import android.boostcamp.com.boostcampvideocall.db.CallLog;
+import android.boostcamp.com.boostcampvideocall.db.Member;
 import android.boostcamp.com.boostcampvideocall.db.MyInfo;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,6 +29,7 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.sktelecom.playrtc.PlayRTC;
 import com.sktelecom.playrtc.PlayRTCFactory;
 import com.sktelecom.playrtc.config.PlayRTCConfig;
@@ -49,6 +53,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 
 import io.realm.Realm;
 
@@ -56,7 +61,7 @@ import io.realm.Realm;
  * Created by Jusung on 2017. 2. 18..
  */
 
-public class VideoCallActvity extends AppCompatActivity implements View.OnClickListener{
+public class VideoCallActvity extends AppCompatActivity implements View.OnClickListener,View.OnTouchListener{
 
 
     public static String TAG;
@@ -76,24 +81,26 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     private ShimmerFrameLayout mEndCall;
 
     private Context mContext;
-    private WindowManager mWidnowMnager;
 
+    private long mStartTime;
+    private long mEndTime;
+    private Date mDate;
 
-
+    private RelativeLayout mMenuButton;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
         TAG = this.getClass().getName();
         setContentView(R.layout.activity_videocall_send);
-
+        mMenuButton=(RelativeLayout)findViewById(R.id.menu_button);
+        mMenuButton.bringToFront();
         mContext=getApplication();
         mEndCall = (ShimmerFrameLayout) findViewById(R.id.shimmer_end_call);
         mEndCall.setDuration(2000);
         mEndCall.setRepeatMode(ObjectAnimator.REVERSE);
         mEndCall.bringToFront();
         mEndCall.setOnClickListener(this);
-
         Intent intent = this.getIntent();
         mName = intent.getStringExtra("name");
         mToken = intent.getStringExtra("token");
@@ -156,6 +163,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             public void onConnectChannel(PlayRTC playRTC, String channelId, String reason) {
                 super.onConnectChannel(playRTC, channelId, reason);
                 mChannelId=channelId;
+                mStartTime=System.currentTimeMillis();
                 callToPeer(channelId);
                 Log.d(TAG,"id"+channelId);
             }
@@ -193,7 +201,6 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             public void onDisconnectChannel(PlayRTC playRTC, String s) {
                 finish();
                 if (playrtc != null) {
-                    playrtc.close();
 
                 }
             }
@@ -242,6 +249,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             parentVideoViewGroup.addView(localView);
             localView.setZOrderMediaOverlay(true);
             localView.initRenderer();
+            localView.setOnTouchListener(this);
         }
     }
 
@@ -278,6 +286,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             // Add the view to the videoViewGroup.
             parentVideoViewGroup.addView(remoteView);
             remoteView.initRenderer();
+            remoteView.setOnTouchListener(this);
         }
 
 
@@ -334,6 +343,20 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         new SendFcmAsyncTask().execute(name, token, phoneNumber, channelId);
     }
 
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+        if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
+            if(mMenuButton.getVisibility()==View.INVISIBLE){
+                mMenuButton.setVisibility(View.VISIBLE);
+            }else{
+                mMenuButton.setVisibility(View.INVISIBLE);
+            }
+            return true;
+        }
+        return super.onTouchEvent(motionEvent);
+    }
+
 
     private class SendFcmAsyncTask extends AsyncTask<String, Void, Void> {
         @Override
@@ -375,6 +398,32 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        playrtc.close();
+        mEndTime=System.currentTimeMillis();
+        mDate=new Date(mEndTime);
+
+        mRealm.beginTransaction();
+//        Member member=mRealm.where(Member.class).equalTo("token",mToken).findFirst();
+        long time=mEndTime-mStartTime;
+//        if(member==null) {
+//            member.setCount(1);
+//            member.setTime(time);
+//        }else{
+//            member.setCount(member.getCount() + 1);
+//            member.setTime(member.getTime() + time);
+//        }
+//        mRealm.insertOrUpdate(member);
+        int sequenceNum=0;
+        if(mRealm.where(CallLog.class).max("id")!=null)
+            sequenceNum=mRealm.where(CallLog.class).max("id").intValue()+1;
+        CallLog callLog=new CallLog();
+        callLog.setId(sequenceNum);
+        callLog.setDate(mDate);
+        callLog.setTo(FirebaseInstanceId.getInstance().getToken());
+        callLog.setFrom(mToken);
+        callLog.setTime(time);
+        mRealm.insert(callLog);
+        mRealm.commitTransaction();
         if(playrtc!=null){
             playrtc.close();
         }
@@ -406,9 +455,9 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             con.setDoOutput(true);
 
             BufferedWriter buffw=new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
-            buffw.write("name="+name+"&token="+token+"&phoneNumber="+phoneNumber+"&channelId="+channelId);
+            String sender=FirebaseInstanceId.getInstance().getToken();
+            buffw.write("name="+name+"&token="+token+"&phoneNumber="+phoneNumber+"&channelId="+channelId+"&sender="+sender);
             buffw.flush();
-            Log.d(TAG,"name="+name+"&token="+token+"&phoneNumber="+phoneNumber+"&channelId="+channelId);
             con.getResponseCode();
             con.disconnect();
 

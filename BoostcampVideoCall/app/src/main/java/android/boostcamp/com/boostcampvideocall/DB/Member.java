@@ -14,6 +14,8 @@ public class Member extends RealmObject{
     private String name;
     private String phoneNumber;
     private String token;
+    private int count;
+    private long time;
 
     public int getId() {
         return id;
@@ -45,5 +47,21 @@ public class Member extends RealmObject{
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 }

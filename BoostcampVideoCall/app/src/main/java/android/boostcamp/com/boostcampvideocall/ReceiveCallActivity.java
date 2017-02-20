@@ -1,26 +1,21 @@
 package android.boostcamp.com.boostcampvideocall;
 
-import android.animation.ObjectAnimator;
+import android.boostcamp.com.boostcampvideocall.db.CallLog;
+import android.boostcamp.com.boostcampvideocall.db.Member;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.facebook.shimmer.ShimmerFrameLayout;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.sktelecom.playrtc.PlayRTC;
 import com.sktelecom.playrtc.PlayRTCFactory;
 import com.sktelecom.playrtc.config.PlayRTCConfig;
@@ -34,17 +29,18 @@ import com.sktelecom.playrtc.util.ui.PlayRTCVideoView;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.util.Date;
+
+import io.realm.Realm;
 
 /**
  * Created by Jusung on 2017. 2. 20..
  */
 
-public class CallReceiveActivity extends AppCompatActivity implements View.OnClickListener{
+public class ReceiveCallActivity extends AppCompatActivity implements View.OnTouchListener{
 
-    private static final String TAG="CallReciveActivity";
+    private static final String TAG = "ReceiveCallActivity";
     private static final String KEY = "60ba608a-e228-4530-8711-fa38004719c1";
-    private static final int FACE_FRONT=1;
 
     private PlayRTCObserver playrtcObserver = null;
     private PlayRTC playrtc = null;
@@ -54,91 +50,32 @@ public class CallReceiveActivity extends AppCompatActivity implements View.OnCli
     private PlayRTCVideoView localView;
     private PlayRTCVideoView remoteView;
 
-
-    private ShimmerFrameLayout mShimmerLayout;
-    private ImageView mImageCallOk,mImageCallEnd;
-    private FrameLayout mLayoutBefore;
-    private TextView mTextTitle,mTextName;
-    private SurfaceView mFaceView;
-    private SurfaceHolder mHolder;
-    private Camera mCamera;
-    private String mName,mPhoneNumber,mToken,mChannelId;
     private RelativeLayout mAfterLayout;
+    private String mName,mPhoneNumber,mToken,mChannelId,mSender;
+
+    private Realm mRealm;
+    private long mStartTime;
+    private long mEndTime;
+    private Date mDate;
+    private RelativeLayout mMenuButton;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_videocall_confirm);
 
-
-        setContentView(R.layout.activity_videocall_receive);
-
-        mShimmerLayout = (ShimmerFrameLayout) findViewById(R.id.shimmer_layout);
-        mShimmerLayout.setDuration(2000);
-        mShimmerLayout.setRepeatMode(ObjectAnimator.REVERSE);
-
-        mImageCallOk=(ImageView)findViewById(R.id.shimmer_ok_call);
-        mImageCallOk.bringToFront();
-        mImageCallEnd=(ImageView)findViewById(R.id.shimmer_end_call);
-        mImageCallOk.bringToFront();
-
-        mImageCallEnd.setOnClickListener(this);
-        mImageCallOk.setOnClickListener(this);
-
-        mTextName=(TextView)findViewById(R.id.tv_send_name);
-        mTextTitle=(TextView)findViewById(R.id.tv_send_title);
-
-        mLayoutBefore=(FrameLayout)findViewById(R.id.fl_before);
+        mMenuButton=(RelativeLayout)findViewById(R.id.menu_button);
         mAfterLayout=(RelativeLayout)findViewById(R.id.video_view_group);
 
-        mFaceView=(SurfaceView)findViewById(R.id.sv_face);
-        mHolder=mFaceView.getHolder();
-        mHolder.addCallback(faceListener);
         Intent intent=getIntent();
         mName=intent.getStringExtra("name");
         mPhoneNumber=intent.getStringExtra("phoneNumber");
         mToken=intent.getStringExtra("token");
         mChannelId=intent.getStringExtra("channelId");
-
-        mTextName.setText(mName);
+        mSender=intent.getStringExtra("sender");
+        mRealm=Realm.getDefaultInstance();
         createPlayRTCInstance();
-
-    }
-    private SurfaceHolder.Callback faceListener=new SurfaceHolder.Callback(){
-        @Override
-        public void surfaceCreated(SurfaceHolder surfaceHolder) {
-            mCamera=Camera.open(FACE_FRONT);
-            try {
-                mCamera.setPreviewDisplay(surfaceHolder);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        @Override
-        public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
-            Camera.Parameters parameters=mCamera.getParameters();
-            parameters.setPreviewSize(width,height);
-            mCamera.startPreview();
-
-        }
-        @Override
-        public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-            if(mCamera!=null) {
-                mCamera.release();
-                mCamera = null;
-            }
-        }
-    };
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mShimmerLayout.stopShimmerAnimation();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mShimmerLayout.startShimmerAnimation();
+        connectChannel(mChannelId);
     }
 
     private void createPlayRTCInstance() {
@@ -197,8 +134,9 @@ public class CallReceiveActivity extends AppCompatActivity implements View.OnCli
                     String channel = channelId.trim();
                     Log.d(TAG, channel);
                 }
-                if(reason.equals("connect")){
-                    Log.d(TAG,"connect");
+                if (reason.equals("connect")) {
+                    mStartTime=System.currentTimeMillis();
+                    Log.d(TAG, "connect");
                 }
             }
 
@@ -215,6 +153,7 @@ public class CallReceiveActivity extends AppCompatActivity implements View.OnCli
                 long delayTime = 0;
                 remoteView.show(delayTime);
                 // Link the media stream to the view.
+
                 playRTCMedia.setVideoRenderer(remoteView.getVideoRenderer());
             }
 
@@ -241,15 +180,6 @@ public class CallReceiveActivity extends AppCompatActivity implements View.OnCli
     private void connectChannel(String responseChannel) {
         try {
 
-            mLayoutBefore.setVisibility(View.GONE);
-            mCamera.release();
-            if(mCamera!=null)
-                mCamera=null;
-
-            mAfterLayout.setVisibility(View.VISIBLE);
-            mAfterLayout.bringToFront();
-            createVideoView();
-
             Log.d(TAG, "접속하는 채널:" + responseChannel.trim());
             playrtc.connectChannel(responseChannel.trim(), new JSONObject());
 
@@ -261,18 +191,17 @@ public class CallReceiveActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
+        createVideoView();
 
     }
-    private void createVideoView() {
 
-        Log.d("TAG","create View1");
+    private void createVideoView() {
         if (localView != null) {
             return;
         }
         Point myViewDimensions = new Point();
         myViewDimensions.x = mAfterLayout.getWidth();
         myViewDimensions.y = mAfterLayout.getHeight();
-        Log.d("TAG","create View2");
         if (remoteView == null) {
             createRemoteVideoView(myViewDimensions, mAfterLayout);
         }
@@ -293,7 +222,6 @@ public class CallReceiveActivity extends AppCompatActivity implements View.OnCli
             param.addRule(RelativeLayout.ALIGN_PARENT_TOP);
             param.setMargins(30, 30, 30, 30);
 
-
             localView = new PlayRTCVideoView(parentVideoViewGroup.getContext());
             localView.setMirror(false);
 
@@ -302,8 +230,7 @@ public class CallReceiveActivity extends AppCompatActivity implements View.OnCli
             parentVideoViewGroup.addView(localView);
             localView.setZOrderMediaOverlay(true);
             localView.initRenderer();
-
-
+            localView.setOnTouchListener(this);
         }
 
     }
@@ -327,25 +254,53 @@ public class CallReceiveActivity extends AppCompatActivity implements View.OnCli
             parentVideoViewGroup.addView(remoteView);
 
             remoteView.initRenderer();
+            remoteView.setOnTouchListener(this);
         }
     }
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.shimmer_end_call:
-                playrtc.deleteChannel();
-                finish();
-                break;
-            case R.id.shimmer_ok_call:
-                connectChannel(mChannelId);
-                break;
-        }
-    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        mEndTime=System.currentTimeMillis();
+        mDate=new Date(mEndTime);
+
+        mRealm.beginTransaction();
+        long time=mEndTime-mStartTime;
+//        Member member=mRealm.where(Member.class).equalTo("token",mSender).findFirst();
+//        if(member!=null) {
+//            member.setCount(member.getCount() + 1);
+//            member.setTime(member.getTime() + time);
+//        }
+//        mRealm.insertOrUpdate(member);
+        int sequenceNum=0;
+        if(mRealm.where(CallLog.class).max("id")!=null)
+            sequenceNum=mRealm.where(CallLog.class).max("id").intValue()+1;
+        CallLog callLog=new CallLog();
+        callLog.setId(sequenceNum);
+        callLog.setDate(mDate);
+        callLog.setTo(FirebaseInstanceId.getInstance().getToken());
+        callLog.setFrom(mToken);
+        callLog.setTime(time);
+        mRealm.insert(callLog);
+        mRealm.commitTransaction();
+
         if(playrtc!=null){
             playrtc.close();
         }
+    }
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+        if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
+
+            if(mMenuButton.getVisibility()==View.INVISIBLE){
+                mMenuButton.setVisibility(View.VISIBLE);
+            }else{
+                mMenuButton.setVisibility(View.INVISIBLE);
+            }
+            return true;
+        }
+        return super.onTouchEvent(motionEvent);
     }
 }

@@ -20,18 +20,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
         Map<String, String> data = remoteMessage.getData();
-        Intent intent=new Intent(this.getApplicationContext(),CallReceiveActivity.class);
+        Intent intent=new Intent(this.getApplicationContext(),ReceiveCheckActivity.class);
 
         String channelId=data.get("channelId");
 
         String name=data.get("name");
         String phoneNumber=data.get("phoneNumber");
         String token=data.get("token");
+        String sender=data.get("sender");
         Log.d(TAG,channelId+" "+name+" "+phoneNumber+" ");
         intent.putExtra("channelId",channelId);
         intent.putExtra("name",name);
         intent.putExtra("phoneNumber",phoneNumber);
         intent.putExtra("token",token);
+        intent.putExtra("sender",sender);
         PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(),1000, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //startActivity(intent);

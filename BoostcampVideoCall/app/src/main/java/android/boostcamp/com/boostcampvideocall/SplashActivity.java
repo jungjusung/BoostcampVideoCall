@@ -1,6 +1,7 @@
 package android.boostcamp.com.boostcampvideocall;
 
 import android.animation.ObjectAnimator;
+import android.boostcamp.com.boostcampvideocall.db.CallLog;
 import android.boostcamp.com.boostcampvideocall.db.Member;
 import android.boostcamp.com.boostcampvideocall.db.MemberService;
 import android.boostcamp.com.boostcampvideocall.db.MyInfo;
@@ -53,7 +54,8 @@ public class SplashActivity extends AppCompatActivity {
     }
     public int getInfoSize() {
         RealmResults<MyInfo> list = realm.where(MyInfo.class).findAll();
-        Toast.makeText(this, "리스트 크기 :" + list.size(), Toast.LENGTH_SHORT).show();
+        RealmResults<CallLog> list2=realm.where(CallLog.class).findAll();
+        Toast.makeText(this, "리스트 크기 :" + list2.size(), Toast.LENGTH_SHORT).show();
         return list.size();
     }
     public void openSignUpActivity(){

@@ -28,8 +28,6 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
 
-
-
     <!--계정 정보-->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -43,12 +41,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <meta-data android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="face" />
+
         <activity android:name=".PermissionCheckActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,8 +60,12 @@
         <activity
             android:name=".SingUpActivity"
             android:windowSoftInputMode="adjustUnspecified" />
-        <activity android:name=".VideoCallActvity"/>
-        <activity android:name=".CallReceiveActivity"/>
+        <activity android:name=".VideoCallActvity" />
+        <activity android:name=".ReceiveCheckActivity" />
+        <activity android:name=".ReceiveCallActivity" />
+        <activity android:name=".MemberDetailActivity">
+        </activity>
+
         <service android:name=".MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
