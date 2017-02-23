@@ -19,7 +19,7 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.jusung.firebase20161214",
-            "certificate_hash": "3069333D7644FF18A522297692DE579578B95D23"
+            "certificate_hash": "3069333d7644ff18a522297692de579578b95d23"
           }
         },
         {
@@ -63,7 +63,51 @@
           "client_type": 1,
           "android_info": {
             "package_name": "android.boostcamp.com.boostcampvideocall",
-            "certificate_hash": "40E3CF64383176F4F0436E4D67476DB108FB6D2F"
+            "certificate_hash": "40e3cf64383176f4f0436e4d67476db108fb6d2f"
+          }
+        },
+        {
+          "client_id": "1073171517175-57611bqgrndcvqstephgvu8llaermtp1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjPcjcYwY15DPMVsuFw44fXRO1bT4X_Fk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1073171517175-57611bqgrndcvqstephgvu8llaermtp1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1073171517175:android:1e0ef399991b68f5",
+        "android_client_info": {
+          "package_name": "com.boostcamp.android.facestroy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1073171517175-7j5m56idcl4q008gcf2u7rm4s4o77jof.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.boostcamp.android.facestroy",
+            "certificate_hash": "40e3cf64383176f4f0436e4d67476db108fb6d2f"
           }
         },
         {

@@ -2,13 +2,14 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="165dp"
-        android:orientation="vertical"
-        android:background="@drawable/background"></LinearLayout>
+        android:background="@drawable/background"
+        android:orientation="vertical"></LinearLayout>
 
 
     <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -21,44 +22,83 @@
         app:civ_border_color="#ffffff"
         app:civ_border_width="2dp" />
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cv_gallery"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="right"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="120dp"
+        android:src="@drawable/ic_camera"
+        app:civ_border_color="#ffffff"
+        app:civ_border_width="2dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="240dp"
         android:orientation="vertical"
-        android:padding="10dp">
-
-        <TextView
-            android:id="@+id/tv_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="장희령"
-            android:textSize="20sp" />
-        <TextView
-            android:id="@+id/tv_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="상태 메세지"
-            android:textSize="12sp"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_marginTop="275dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:orientation="vertical">
-
+        android:padding="10dp"
+        android:paddingLeft="30dp"
+        android:paddingRight="20dp">
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="30dp">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/circle"
+
+                android:text="이 름"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+            <EditText
+                android:id="@+id/et_name"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/circle_gray"
+                android:paddingLeft="25dp"
+                android:hint="이름을 입력하세요"
+                android:textColorHint="@android:color/white"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp">
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/circle"
+
+                android:text="상태메세지"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+            <EditText
+                android:id="@+id/et_status"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/circle_gray"
+                android:paddingLeft="25dp"
+                android:hint="상태메세지를 입력하세요."
+                android:textColorHint="@android:color/white"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp">
+            <TextView
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle"
 
@@ -71,57 +111,10 @@
                 android:layout_width="240dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle_gray"
-                android:gravity="center"
+                android:paddingLeft="25dp"
                 android:text="010-5145-2554"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/circle"
-                android:text="통화횟수"
-                android:gravity="center"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_count"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/circle_gray"
-                android:text="10회"
-                android:gravity="center"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/circle"
-
-                android:gravity="center"
-                android:layout_marginLeft="10dp"
-                android:text="총통화시간"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_total_time"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/circle_gray"
-                android:gravity="center"
-                android:text="06:44:10"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-        </LinearLayout>
-
     </LinearLayout>
 </FrameLayout>
