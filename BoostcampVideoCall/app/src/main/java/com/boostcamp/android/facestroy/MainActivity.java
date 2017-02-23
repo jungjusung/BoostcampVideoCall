@@ -13,13 +13,16 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +74,16 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
         navigationTabBar = (NavigationTabBar) findViewById(R.id.nav_facestory);
         mToolbar=(CollapsingToolbarLayout)findViewById(R.id.toolbar);
         mAppbar=(AppBarLayout)findViewById(R.id.appbar_facestory);
+        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)mAppbar.getLayoutParams();
+        if(mMyInformtaion.getStatus().equals("")) {
+            //대화명 없을시
+            float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics());
+            lp.height=(int)pixels;
+        }else{
+            //대화명 있을시
+            float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 215, getResources().getDisplayMetrics());
+            lp.height=(int)pixels;
+        }
         mMyImage=(CircleImageView)findViewById(R.id.cv_my_image);
         mMyImage.setOnClickListener(this);
         mMyName=(TextView)findViewById(R.id.tv_my_name);
@@ -82,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
                 .into(mMyImage);
         mMyName.setText(mMyInformtaion.getName());
         mMyStatus.setText(mMyInformtaion.getStatus());
+        mMyStatus.setMaxLines(1);
+        mMyStatus.setEllipsize(TextUtils.TruncateAt.END);
 
 
         mAppbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -123,8 +138,6 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
                 final RecyclerView recyclerViewMember = (RecyclerView) viewMember.findViewById(R.id.rv_facestory);
                 final RecyclerView recyclerCallLog = (RecyclerView) viewCallLog.findViewById(R.id.rv_call_log);
 
-                final View status = LayoutInflater.from(getBaseContext()).inflate(R.layout.activity_my_info, null, false);
-
                 recyclerViewMember.setHasFixedSize(true);
                 recyclerViewMember.setLayoutManager(new LinearLayoutManager(
                         getBaseContext(), LinearLayoutManager.VERTICAL, false)
@@ -153,9 +166,7 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
                     container.addView(viewCallLog);
                     return viewCallLog;
                 } else {
-
-                    container.addView(status);
-                    return status;
+                    return null;
                 }
             }
         });

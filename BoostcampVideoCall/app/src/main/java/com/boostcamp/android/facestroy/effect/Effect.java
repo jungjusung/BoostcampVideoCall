@@ -8,7 +8,7 @@ import android.widget.ImageView;
  * Created by Jusung on 2017. 2. 19..
  */
 
-public class EffectFirst extends ImageView {
+public class Effect extends ImageView {
     private int winX;
     private int winY;
     private int x;
@@ -18,7 +18,7 @@ public class EffectFirst extends ImageView {
 
     ViewGroup.LayoutParams params;
 
-    public EffectFirst(Context context, int winX, int winY, int width, int height) {
+    public Effect(Context context, int winX, int winY, int width, int height) {
         super(context);
         this.x = winX - width / 2;
         this.y = winY - height / 2;

@@ -2,11 +2,9 @@ package com.boostcamp.android.facestroy.effect;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.Display;
 import android.view.View;
@@ -44,7 +42,7 @@ public class MustacheEffectForOtherThread extends Thread {
 
     private RelativeLayout mLayout;
     RelativeLayout.LayoutParams param;
-    private EffectFirst effect;
+    private Effect effect;
 
     public MustacheEffectForOtherThread(PlayRTCVideoView localView, PlayRTCVideoView remoteView, Context context, RelativeLayout relativeLayout) {
         this.localView = localView;
@@ -61,7 +59,7 @@ public class MustacheEffectForOtherThread extends Thread {
                 .build();
         safeDetector = new SafeFaceDetector(faceDetector);
 
-        effect = new EffectFirst(context,0,0, 150, 100);
+        effect = new Effect(context,0,0, 150, 100);
         effect.setBackgroundResource(R.drawable.effect1);
         effect.setVisibility(View.INVISIBLE);
         param = new RelativeLayout.LayoutParams(250, 120);

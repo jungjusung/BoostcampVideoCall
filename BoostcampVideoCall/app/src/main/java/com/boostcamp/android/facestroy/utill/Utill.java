@@ -264,10 +264,12 @@ public class Utill {
                                 newMember.setCount(0);
                                 newMember.setTime(0);
 
-                                newMember.setUrl("");
-                                newMember.setStatus("");
-
-                                newMember.setStatus(member.getStatus());
+                                if(member.getStatus().equals(""))
+                                    newMember.setStatus("");
+                                else
+                                    newMember.setStatus(member.getStatus());
+                                if(member.getStatus().equals(""))
+                                    newMember.setUrl(member.getUrl());
                                 realm.insertOrUpdate(newMember);
                                 realm.commitTransaction();
                             }
@@ -364,9 +366,11 @@ public class Utill {
     }
 
     public static void stopRington(MediaPlayer mp) {
-        if (mp.isPlaying()) {
-            mp.stop();
-            mp.release();
+        if(mp!=null) {
+            if (mp.isPlaying()) {
+                mp.stop();
+                mp.reset();
+            }
         }
     }
 }

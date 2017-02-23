@@ -117,13 +117,13 @@
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/ic_clear"
+                android:background="@drawable/ic_heart"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="종료"
+                android:text="하트"
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
                 />
@@ -133,18 +133,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_centerInParent="true"
+            android:layout_marginLeft="120dp"
             >
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/ic_loop"
+                android:background="@drawable/ic_mustache"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="전환"
+                android:text="수염"
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
                 />
@@ -154,8 +154,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="50dp"
+            android:layout_marginLeft="190dp"
             >
             <ImageView
                 android:layout_width="40dp"
@@ -166,12 +165,33 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="효과"
+                android:text="효과3"
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
                 />
         </LinearLayout>
-
+        <LinearLayout
+            android:id="@+id/btn_effect_exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50dp"
+            >
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ic_delete"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="효과 종료"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                />
+        </LinearLayout>
     </RelativeLayout>
 
 </FrameLayout>

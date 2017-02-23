@@ -45,8 +45,6 @@ public class SplashActivity extends AppCompatActivity {
     }
     public int getInfoSize() {
         RealmResults<MyInfo> list = mRealm.where(MyInfo.class).findAll();
-        RealmResults<CallLog> list2= mRealm.where(CallLog.class).findAll();
-        Toast.makeText(this, "리스트 크기 :" + list2.size(), Toast.LENGTH_SHORT).show();
         return list.size();
     }
     public void openSignUpActivity(){

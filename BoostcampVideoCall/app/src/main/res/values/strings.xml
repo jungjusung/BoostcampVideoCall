@@ -7,4 +7,5 @@
     <string name="myProfile">내 프로필</string>
     <string name="myFriend">친구 목록</string>
     <string name="edit">edit</string>
+    <string name="call_log">통화 기록</string>
 </resources>

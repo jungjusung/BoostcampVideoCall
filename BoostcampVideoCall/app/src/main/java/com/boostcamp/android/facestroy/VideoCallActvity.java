@@ -22,6 +22,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.boostcamp.android.facestroy.effect.HeartTreeEffectForMeThread;
+import com.boostcamp.android.facestroy.effect.HeartTreeEffectForOtherThread;
 import com.boostcamp.android.facestroy.effect.MustacheEffectForMeThread;
 import com.boostcamp.android.facestroy.effect.MustacheEffectForOtherThread;
 import com.boostcamp.android.facestroy.utill.Utill;
@@ -50,7 +52,6 @@ import java.net.URL;
 import java.util.Date;
 
 import io.realm.Realm;
-import io.realm.internal.Util;
 
 /**
  * Created by Jusung on 2017. 2. 18..
@@ -88,6 +89,8 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     private int mLocation[] = new int[2];
     public static MustacheEffectForMeThread mustacheEffectForMeThread;
     public static MustacheEffectForOtherThread mustacheEffectForOtherThread;
+    public static HeartTreeEffectForOtherThread heartTreeEffectForOtherThread;
+    private HeartTreeEffectForMeThread heartTreeEffectForMeThread;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -201,8 +204,11 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 if (localView != null) {
 
                     //애니메이션 효과 있을시
-                    mustacheEffectForMeThread = new MustacheEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
-                    mustacheEffectForOtherThread = new MustacheEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
+//                    mustacheEffectForMeThread = new MustacheEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+//                    mustacheEffectForOtherThread = new MustacheEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
+//                    heartTreeEffectForOtherThread= new HeartTreeEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
+                    heartTreeEffectForMeThread= new HeartTreeEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+
                 }
                 localView.getHolder().addCallback(new SurfaceCallback());
             }
@@ -461,8 +467,9 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 //전환
                 break;
             case R.id.btn_effect1:
-                mustacheEffectForMeThread.start();
-                mustacheEffectForOtherThread.start();
+//                mustacheEffectForMeThread.start();
+//                mustacheEffectForOtherThread.start();
+                heartTreeEffectForMeThread.start();
                 mEffectButton.setVisibility(View.INVISIBLE);
                 break;
             case R.id.btn_effect3:
@@ -501,6 +508,8 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         callLog.setId(sequenceNum);
         callLog.setDate(mDate);
         callLog.setTo(FirebaseInstanceId.getInstance().getToken());
+        Log.d(TAG,"To:"+FirebaseInstanceId.getInstance().getToken());
+        Log.d(TAG,"To:"+mToken);
         callLog.setFrom(mToken);
         callLog.setTime(time);
         mRealm.insert(callLog);

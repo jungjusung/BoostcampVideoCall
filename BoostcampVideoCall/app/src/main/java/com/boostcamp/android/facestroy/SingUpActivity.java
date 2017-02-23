@@ -12,6 +12,7 @@ import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,6 +29,7 @@ import io.realm.Realm;
 
 public class SingUpActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG="SingUpActivity";
     private EditText mEditName, mEditPhone;
     private Button mRegistBtn;
     private Realm realm;
@@ -40,7 +42,7 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_sign_up);
         token = FirebaseInstanceId.getInstance().getToken();
 
-
+        Log.d(TAG,token);
         mEditName = (EditText) findViewById(R.id.et_name);
         mEditPhone = (EditText) findViewById(R.id.et_phone);
 
@@ -109,7 +111,6 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
             info.setToken(token);
         info.setUrl("");
         info.setStatus("");
-
         realm.insert(info);
         realm.commitTransaction();
     }

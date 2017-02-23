@@ -100,7 +100,7 @@ public class ReceiveCheckActivity extends AppCompatActivity implements View.OnCl
         public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
             Camera.Parameters parameters=mCamera.getParameters();
             parameters.setRotation(90);
-            parameters.setPreviewSize(width,height);
+            parameters.getSupportedPreviewSizes();
             mCamera.setDisplayOrientation(90);
             mCamera.setParameters(parameters);
             mCamera.startPreview();

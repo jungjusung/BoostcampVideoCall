@@ -6,15 +6,17 @@
 
     <LinearLayout
         android:id="@+id/cv_facestory"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/border_bottom">
 
 
         <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/iv_image"
+            android:id="@+id/cv_image"
             android:layout_width="80sp"
             android:layout_height="80sp"
             android:layout_gravity="center_horizontal|center_vertical"
@@ -22,13 +24,14 @@
             app:civ_border_color="#ffffff"
             app:civ_border_width="2dp"
             android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
             />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="2.5"
+            android:layout_weight="2.0"
             android:orientation="vertical"
             android:paddingLeft="15dp"
             android:paddingRight="15dp">
@@ -64,6 +67,15 @@
                 android:text="영상통화"
                 android:textColor="@color/accent"
                 android:textSize="12sp" />
+
         </LinearLayout>
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="0dp"
+            android:layout_height="80sp"
+            android:layout_weight="1"
+            android:textSize="12dp"
+            android:gravity="start|center_vertical"
+            />
     </LinearLayout>
 </LinearLayout>
