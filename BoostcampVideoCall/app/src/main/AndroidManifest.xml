@@ -65,8 +65,8 @@
         <activity android:name="com.boostcamp.android.facestroy.VideoCallActvity" />
         <activity android:name="com.boostcamp.android.facestroy.ReceiveCheckActivity" />
         <activity android:name="com.boostcamp.android.facestroy.ReceiveCallActivity" />
-        <activity android:name="com.boostcamp.android.facestroy.MemberDetailActivity">
-        </activity>
+        <activity android:name="com.boostcamp.android.facestroy.MemberDetailActivity"/>
+        <activity android:name=".ModMyInfoActivity"/>
 
         <service android:name="com.boostcamp.android.facestroy.MyFirebaseMessagingService">
             <intent-filter>

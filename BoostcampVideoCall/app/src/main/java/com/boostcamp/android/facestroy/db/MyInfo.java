@@ -14,6 +14,7 @@ public class MyInfo extends RealmObject {
     @PrimaryKey
     private String token;
     private String url;
+    private String status;
 
     public String getName() {
         return name;
@@ -45,5 +46,13 @@ public class MyInfo extends RealmObject {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

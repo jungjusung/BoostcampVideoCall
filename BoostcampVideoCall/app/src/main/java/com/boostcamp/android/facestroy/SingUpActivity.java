@@ -108,6 +108,7 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
         else
             info.setToken(token);
         info.setUrl("");
+        info.setStatus("");
 
         realm.insert(info);
         realm.commitTransaction();
@@ -138,6 +139,7 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
             super.onPostExecute(aVoid);
             Intent intent=new Intent(getApplicationContext(),MainActivity.class);
             startActivity(intent);
+            finish();
         }
     }
 
