@@ -1,8 +1,11 @@
 package com.boostcamp.android.facestroy;
 
 import android.animation.ObjectAnimator;
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +15,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.boostcamp.android.facestroy.utill.PushWakeLock;
+import com.boostcamp.android.facestroy.utill.Utill;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
 import java.io.IOException;
@@ -33,6 +38,9 @@ public class ReceiveCheckActivity extends AppCompatActivity implements View.OnCl
     private Camera mCamera;
     private String mName,mPhoneNumber,mToken,mChannelId,mSender;
 
+    private Context mContext;
+    private MediaPlayer mPlayer;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(R.style.myNoActionBar);
@@ -41,8 +49,8 @@ public class ReceiveCheckActivity extends AppCompatActivity implements View.OnCl
 
         setContentView(R.layout.activity_videocall_receive);
 
-
-
+        mContext=getApplicationContext();
+        mPlayer=new MediaPlayer();
         mShimmerLayout = (ShimmerFrameLayout) findViewById(R.id.shimmer_layout);
         mShimmerLayout.setDuration(2000);
         mShimmerLayout.setRepeatMode(ObjectAnimator.REVERSE);
@@ -73,6 +81,8 @@ public class ReceiveCheckActivity extends AppCompatActivity implements View.OnCl
         mHolder=mFaceView.getHolder();
         mHolder.addCallback(faceListener);
 
+        Utill.startRingtone(mContext,mPlayer);
+
         //createPlayRTCInstance();
         //connectChannel(mChannelId);
     }
@@ -89,9 +99,12 @@ public class ReceiveCheckActivity extends AppCompatActivity implements View.OnCl
         @Override
         public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
             Camera.Parameters parameters=mCamera.getParameters();
+            parameters.setRotation(90);
             parameters.setPreviewSize(width,height);
+            mCamera.setDisplayOrientation(90);
+            mCamera.setParameters(parameters);
             mCamera.startPreview();
-
+            //PushWakeLock.acquireCpuWakeLock(mContext);
         }
         @Override
         public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
@@ -122,6 +135,8 @@ public class ReceiveCheckActivity extends AppCompatActivity implements View.OnCl
                 finish();
                 break;
             case R.id.shimmer_ok_call:
+                Utill.stopRington(mPlayer);
+
                 Intent intent=new Intent(getApplicationContext(),ReceiveCallActivity.class);
                 intent.putExtra("name",mName);
                 intent.putExtra("phoneNumber",mPhoneNumber);
@@ -129,6 +144,7 @@ public class ReceiveCheckActivity extends AppCompatActivity implements View.OnCl
                 intent.putExtra("channelId",mChannelId);
                 intent.putExtra("sender",mSender);
                 startActivity(intent);
+
                 finish();
                 break;
         }

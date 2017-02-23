@@ -2,11 +2,7 @@ package com.boostcamp.android.facestroy;
 
 import com.boostcamp.android.facestroy.db.Member;
 
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -18,33 +14,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.boostcamp.android.facestroy.db.MemberService;
+import com.boostcamp.android.facestroy.utill.Utill;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Jusung on 2017. 2. 20..
@@ -133,19 +109,13 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
 
             member = list.get(position);
 
-            if (member.getUrl() == "") {
-                //디폴트 이미지 !!
-            } else {
-                Glide.with(getApplicationContext())
-                        .load(member.getUrl())
-                        .asBitmap()
-                        .into(new SimpleTarget<Bitmap>(100, 100) {
-                            @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
-                                mProfile.setImageBitmap(resource);
-                            }
-                        });
-            }
+            Glide.with(getApplicationContext())
+                    .load(member.getUrl())
+                    .asBitmap()
+                    .error(R.drawable.sample)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(mProfile);
+
 
             mName.setText(member.getName());
             mPhoneNumber.setText(member.getPhoneNumber());

@@ -11,8 +11,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.boostcamp.android.facestroy.effect.MustacheEffectForMeThread;
+import com.boostcamp.android.facestroy.effect.MustacheEffectForOtherThread;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.sktelecom.playrtc.PlayRTC;
 import com.sktelecom.playrtc.PlayRTCFactory;
@@ -35,7 +38,7 @@ import io.realm.Realm;
  * Created by Jusung on 2017. 2. 20..
  */
 
-public class ReceiveCallActivity extends AppCompatActivity implements View.OnTouchListener{
+public class ReceiveCallActivity extends AppCompatActivity implements View.OnTouchListener,View.OnClickListener{
 
     private static final String TAG = "ReceiveCallActivity";
     private static final String KEY = "60ba608a-e228-4530-8711-fa38004719c1";
@@ -56,14 +59,29 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
     private long mEndTime;
     private Date mDate;
     private RelativeLayout mMenuButton;
+    private LinearLayout mBtnExit,mBtnEffect, mBtnRotation;
+    private Context mContext;
+    public static MustacheEffectForMeThread mustacheEffectForMeThread;
+    public static MustacheEffectForOtherThread mustacheEffectForOtherThread;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_videocall_confirm);
+        mContext = getApplication();
+
 
         mMenuButton=(RelativeLayout)findViewById(R.id.menu_button);
         mAfterLayout=(RelativeLayout)findViewById(R.id.video_view_group);
+
+
+        mBtnEffect=(LinearLayout)findViewById(R.id.btn_effect);
+        mBtnExit=(LinearLayout)findViewById(R.id.btn_exit);
+        mBtnRotation =(LinearLayout)findViewById(R.id.btn_rotation);
+        mBtnEffect.setOnClickListener(this);
+        mBtnExit.setOnClickListener(this);
+        mBtnRotation.setOnClickListener(this);
 
         Intent intent=getIntent();
         mName=intent.getStringExtra("name");
@@ -151,7 +169,12 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 long delayTime = 0;
                 remoteView.show(delayTime);
                 // Link the media stream to the view.
-
+                RelativeLayout myVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
+                if (localView != null) {
+                    //애니메이션 효과 있을시
+                    mustacheEffectForMeThread = new MustacheEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+                    mustacheEffectForOtherThread = new MustacheEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
+                }
                 playRTCMedia.setVideoRenderer(remoteView.getVideoRenderer());
             }
 
@@ -291,15 +314,30 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
 
-        if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
-
-            if(mMenuButton.getVisibility()==View.INVISIBLE){
-                mMenuButton.setVisibility(View.VISIBLE);
-            }else{
-                mMenuButton.setVisibility(View.INVISIBLE);
-            }
-            return true;
+        if (mMenuButton.getVisibility() == View.GONE) {
+            mMenuButton.setVisibility(View.VISIBLE);
+        } else if (mMenuButton.getVisibility() == View.INVISIBLE) {
+            mMenuButton.setVisibility(View.VISIBLE);
+        } else {
+            mMenuButton.setVisibility(View.INVISIBLE);
         }
         return super.onTouchEvent(motionEvent);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_exit:
+                playrtc.deleteChannel();
+                finish();
+                break;
+            case R.id.btn_effect:
+                //효과
+                break;
+            case R.id.btn_rotation:
+                //전환
+                break;
+
+        }
     }
 }

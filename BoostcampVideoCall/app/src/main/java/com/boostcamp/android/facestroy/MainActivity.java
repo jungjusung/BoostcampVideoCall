@@ -5,7 +5,9 @@ import com.boostcamp.android.facestroy.db.Member;
 import com.boostcamp.android.facestroy.db.MyInfo;
 import com.boostcamp.android.facestroy.db.calllog.CallLogAdapter;
 import com.boostcamp.android.facestroy.db.memberinfo.MemberAdapter;
+import com.boostcamp.android.facestroy.utill.Utill;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import android.content.Intent;
@@ -32,18 +34,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import devlight.io.library.ntb.NavigationTabBar;
@@ -66,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
     private static final int VIEW_PAGER_SIZE = 3;
 
     private NavigationTabBar navigationTabBar;
-    private Realm realm;
+    private Realm mRelam;
     private int[] icons = {R.drawable.ic_contacts, R.drawable.ic_video_call, R.drawable.ic_theaters};
     private String[] colors = {"#f9bb72", "#dd6495", "#72d3b4"};
     private String[] titles = {"연락처", "통화기록", "프로필"};
@@ -82,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
         setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        realm = Realm.getDefaultInstance();
+        mRelam = Realm.getDefaultInstance();
         initUI();
     }
 
@@ -129,16 +125,18 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
                 );
 
                 if (position == 0) {
-                    final RealmResults<Member> list = realm.where(Member.class).findAll();
+                    final RealmResults<Member> list = mRelam.where(Member.class).findAll();
                     for (Member call : list) {
+                        Log.d(TAG,call.getUrl()+"");
                         Log.d(TAG, call.getTime() + "");
                         Log.d(TAG, call.getCount() + "");
                     }
                     recyclerViewMember.setAdapter(new MemberAdapter(getApplicationContext(), MainActivity.this, list, true));
+
                     container.addView(viewMember);
                     return viewMember;
                 } else if (position == 1) {
-                    RealmResults<CallLog> list = realm.where(CallLog.class).findAll();
+                    RealmResults<CallLog> list = mRelam.where(CallLog.class).findAll();
 
                     recyclerCallLog.setAdapter(new CallLogAdapter(getApplicationContext(), MainActivity.this, list, true));
                     container.addView(viewCallLog);
@@ -146,10 +144,11 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
                 } else {
 
                     mProfileImage = (CircleImageView) status.findViewById(R.id.profile_image);
-                    Log.d(TAG, realm.where(MyInfo.class).findFirst().getUrl());
-                    MyInfo info = realm.where(MyInfo.class).findFirst();
+                    Log.d(TAG, mRelam.where(MyInfo.class).findFirst().getUrl());
+                    MyInfo info = mRelam.where(MyInfo.class).findFirst();
                     if (!info.getUrl().equals("")) {
-                        Glide.with(getApplicationContext()).load(info.getUrl()).into(mProfileImage);
+                        Glide.with(getApplicationContext()).load(info.getUrl()).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProfileImage);
+
                     }
 
                     mCircleGallery = (CircleImageView) status.findViewById(R.id.cv_gallery);
@@ -342,18 +341,21 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            realm.beginTransaction();
-            MyInfo info = realm.where(MyInfo.class).findFirst();
+            mRelam.beginTransaction();
+            MyInfo info = mRelam.where(MyInfo.class).findFirst();
             info.setUrl(s);
-            realm.copyToRealmOrUpdate(info);
-            realm.commitTransaction();
+            mRelam.copyToRealmOrUpdate(info);
+            mRelam.commitTransaction();
+            Glide.with(getApplicationContext()).load(info.getUrl()).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProfileImage);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        final RealmResults<Member> list = realm.where(Member.class).findAll();
+        Log.d(TAG,"리쥼!!");
+        Utill.updateMemberToRealm(getApplicationContext());
+//        final RealmResults<Member> list = mRelam.where(Member.class).findAll();
 //        try {
 //            new AsyncTask<List, Void, List>() {
 //                @Override
@@ -370,11 +372,11 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
 //                    super.onPostExecute(mList);
 //
 //                    for (int i = 0; i < mList.size(); i++) {
-//                        realm.beginTransaction();
+//                        mRelam.beginTransaction();
 //                        Member bMember = list.get(i);
 //                        bMember = (Member) mList.get(i);
-//                        realm.insertOrUpdate(bMember);
-//                        realm.commitTransaction();
+//                        mRelam.insertOrUpdate(bMember);
+//                        mRelam.commitTransaction();
 //                    }
 //                }
 //            }.execute(list).get();

@@ -23,8 +23,10 @@
             android:layout_height="50sp"
             android:background="@drawable/call_end" />
     </com.facebook.shimmer.ShimmerFrameLayout>
+
+
     <RelativeLayout
-        android:visibility="invisible"
+        android:visibility="gone"
         android:id="@+id/menu_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -97,4 +99,79 @@
         </LinearLayout>
 
     </RelativeLayout>
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/effect_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#70484747"
+        android:layout_gravity="center|bottom"
+        >
+        <LinearLayout
+            android:id="@+id/btn_effect1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="50dp"
+            >
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ic_clear"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="종료"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/btn_effect2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true"
+            >
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ic_loop"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="전환"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/btn_effect3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50dp"
+            >
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ic_palette"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="효과"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                />
+        </LinearLayout>
+
+    </RelativeLayout>
+
 </FrameLayout>

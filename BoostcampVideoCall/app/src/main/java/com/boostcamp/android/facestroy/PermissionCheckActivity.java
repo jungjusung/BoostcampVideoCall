@@ -56,7 +56,8 @@ public class PermissionCheckActivity extends AppCompatActivity {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.GET_ACCOUNTS,
                         Manifest.permission.READ_CONTACTS,
-                        Manifest.permission.WRITE_CONTACTS)
+                        Manifest.permission.WRITE_CONTACTS,
+                        Manifest.permission.WAKE_LOCK)
                 .check();
     }
 

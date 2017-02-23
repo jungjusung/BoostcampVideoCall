@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.boostcamp.android.facestroy.utill.Utill;
 import com.google.firebase.iid.FirebaseInstanceId;
 import java.util.Locale;
 import io.realm.Realm;
@@ -102,7 +103,10 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
         realm.beginTransaction();
         info.setName(name);
         info.setPhoneNumber(phoneNumber);
-        info.setToken(token);
+        if(token==null||token.equals(""))
+            info.setToken(FirebaseInstanceId.getInstance().getToken());
+        else
+            info.setToken(token);
         info.setUrl("");
 
         realm.insert(info);
@@ -122,6 +126,9 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
             String name=datas[0];
             String phoneNumber=datas[1];
             String token=datas[2];
+            if(token==null||token.equals(""))
+                token=FirebaseInstanceId.getInstance().getToken();
+
             String url="http://1-dot-boostcamp-jusung.appspot.com/boostcampDB";
             Utill.registMemberInfo(name,phoneNumber,token,url);
             return null;
