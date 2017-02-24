@@ -29,6 +29,7 @@ import com.boostcamp.android.facestroy.effect.RabbitEffectForMeThread;
 import com.boostcamp.android.facestroy.effect.RabbitEffectForOtherThread;
 import com.boostcamp.android.facestroy.utill.Utill;
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.google.android.gms.vision.face.Face;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.sktelecom.playrtc.PlayRTC;
 import com.sktelecom.playrtc.PlayRTCFactory;
@@ -65,9 +66,9 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
 
     private static final String TAG = "VideoCallActvity";
     private static final String KEY = "60ba608a-e228-4530-8711-fa38004719c1";
-    private static final int EFFECT_TREEHEART=0;
-    private static final int EFFECT_MUSTACHE=1;
-    private static final int EFFECT_RABBIT=2;
+    private static final int EFFECT_TREEHEART = 0;
+    private static final int EFFECT_MUSTACHE = 1;
+    private static final int EFFECT_RABBIT = 2;
 
 
     private PlayRTCObserver playrtcObserver = null;
@@ -94,15 +95,19 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     private RelativeLayout mEffectButton;
     private LinearLayout mBtnExit, mBtnEffect, mBtnRotation;
     private LinearLayout mEffectHeart, mEffectRabbit, mEffectMustache, mEffectExit;
-    private List<LinearLayout> mEffectList =new LinkedList<>();
+    private List<LinearLayout> mEffectList = new LinkedList<>();
     private int mLocation[] = new int[2];
     private RelativeLayout myVideoViewGroup;
-    public static MustacheEffectForMeThread mustacheEffectForMeThread;
-    public static MustacheEffectForOtherThread mustacheEffectForOtherThread;
+
+    private boolean mEffectFlag = false;
+
+    private HeartTreeEffectForMeThread heartTreeEffectForMeThread;
+    private MustacheEffectForMeThread mustacheEffectForMeThread;
+    private RabbitEffectForMeThread rabbitEffectForMeThread;
+
     public static HeartTreeEffectForOtherThread heartTreeEffectForOtherThread;
-    public static HeartTreeEffectForMeThread heartTreeEffectForMeThread;
+    public static MustacheEffectForOtherThread mustacheEffectForOtherThread;
     public static RabbitEffectForOtherThread rabbitEffectForOtherThread;
-    public static RabbitEffectForMeThread rabbitEffectForMeThread;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -225,13 +230,13 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 if (localView != null) {
 
                     //애니메이션 효과 있을시
+                    mustacheEffectForOtherThread = new MustacheEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
+                    heartTreeEffectForOtherThread = new HeartTreeEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
+                    rabbitEffectForOtherThread = new RabbitEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
 
-//                    mustacheEffectForOtherThread = new MustacheEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
-//                    heartTreeEffectForOtherThread= new HeartTreeEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
-//                     rabbitEffectForOtherThread = new RabbitEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
                     heartTreeEffectForMeThread = new HeartTreeEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
                     mustacheEffectForMeThread = new MustacheEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
-                    rabbitEffectForMeThread=new RabbitEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+                    rabbitEffectForMeThread = new RabbitEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
                 }
                 localView.getHolder().addCallback(new SurfaceCallback());
             }
@@ -474,8 +479,14 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View view) {
+        String sender = FirebaseInstanceId.getInstance().getToken();
+        String url = "http://1-dot-boostcamp-jusung.appspot.com/effect";
+        String point = "sender";
+        String effect, check;
         switch (view.getId()) {
+
             case R.id.shimmer_end_call:
+
                 playrtc.deleteChannel();
                 finish();
                 break;
@@ -490,42 +501,50 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             case R.id.btn_rotation:
                 //전환
                 break;
+            //쓰레드 종료 재시작 로직!!!
             case R.id.effect_heartTree:
-                //쓰레드 종료 재시작 로직!!!
+
                 if (heartTreeEffectForMeThread.getState() == Thread.State.NEW) {
+                    Log.d(TAG, "하트쓰레드 시작");
                     heartTreeEffectForMeThread.start();
-                } else if (heartTreeEffectForMeThread.getState() == Thread.State.RUNNABLE) {
-                    heartTreeEffectForMeThread.effectOff();
-                    heartTreeEffectForMeThread.stopThread();
-                }else if(heartTreeEffectForMeThread.getState() == Thread.State.TERMINATED){
-                    heartTreeEffectForMeThread.effectOn();
-                    heartTreeEffectForMeThread.restartThread();
+                    effect="heart";
+                    check="start";
+                    new SenderAsync().execute(url,mToken,effect,sender,check,point);
+
+                } else if (heartTreeEffectForMeThread.getState() == Thread.State.TERMINATED) {
+                    Log.d(TAG, "하트쓰레드 재생성");
+                    heartTreeEffectForMeThread = new HeartTreeEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+                    heartTreeEffectForMeThread.start();
                 }
-                btnSetEnabled(EFFECT_TREEHEART);
+
+
+                btnSetEnabled();
                 break;
             case R.id.effect_mustache:
+
                 if (mustacheEffectForMeThread.getState() == Thread.State.NEW) {
+                    effect = "mustache";
+                    check = "start";
+                    Log.d(TAG, "수염 쓰레드 생성");
                     mustacheEffectForMeThread.start();
-                } else if (mustacheEffectForMeThread.getState() == Thread.State.RUNNABLE) {
-                    mustacheEffectForMeThread.effectOff();
-                    mustacheEffectForMeThread.stopThread();
-                }else if(mustacheEffectForMeThread.getState() == Thread.State.TERMINATED){
-                    mustacheEffectForMeThread.effectOn();
-                    mustacheEffectForMeThread.restartThread();
+                    new SenderAsync().execute(url,mToken,effect,sender,check,point);
+                } else if (mustacheEffectForMeThread.getState() == Thread.State.TERMINATED) {
+                    mustacheEffectForMeThread = new MustacheEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+                    mustacheEffectForMeThread.start();
                 }
-                btnSetEnabled(EFFECT_MUSTACHE);
+                btnSetEnabled();
                 break;
             case R.id.effect_rabbit:
                 if (rabbitEffectForMeThread.getState() == Thread.State.NEW) {
+                    effect = "rabbit";
+                    check = "start";
                     rabbitEffectForMeThread.start();
-                } else if (rabbitEffectForMeThread.getState() == Thread.State.RUNNABLE) {
-                    rabbitEffectForMeThread.effectOff();
-                    rabbitEffectForMeThread.stopThread();
-                }else if(rabbitEffectForMeThread.getState() == Thread.State.TERMINATED){
-                    rabbitEffectForMeThread=new RabbitEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+                    new SenderAsync().execute(url,mToken,effect,sender,check,point);
+                }else if (rabbitEffectForMeThread.getState() == Thread.State.TERMINATED) {
+                    rabbitEffectForMeThread = new RabbitEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
                     rabbitEffectForMeThread.start();
                 }
-                btnSetEnabled(EFFECT_RABBIT);
+                btnSetEnabled();
                 break;
             case R.id.btn_effect_exit:
                 exitThread();
@@ -587,45 +606,58 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
 
         }
     }
-    public void btnSetEnabled(int flag){
-        for(int i=0;i<mEffectList.size();i++){
-            if(flag==i)
-                mEffectList.get(i).setEnabled(true);
 
-            mEffectList.get(i).setEnabled(false);
-        }
+    public void btnSetEnabled() {
+        for (LinearLayout btn : mEffectList)
+            btn.setEnabled(false);
     }
-    public void allBtnSetEnabled(){
-        for(LinearLayout btn:mEffectList)
+
+    public void allBtnSetEnabled() {
+        for (LinearLayout btn : mEffectList)
             btn.setEnabled(true);
     }
 
     public void exitThread() {
-        if (mustacheEffectForMeThread != null) {
-            mustacheEffectForMeThread.effectOff();
-            mustacheEffectForMeThread.stopThread();
-        }
+        String sender = FirebaseInstanceId.getInstance().getToken();
+        String url = "http://1-dot-boostcamp-jusung.appspot.com/effect";
+        String point = "sender";
 
-        if (mustacheEffectForOtherThread != null) {
-            mustacheEffectForOtherThread.effectOff();
-            mustacheEffectForOtherThread.stopThread();
-        }
-
-        if (rabbitEffectForOtherThread != null) {
-            rabbitEffectForOtherThread.effectOff();
-            rabbitEffectForOtherThread.stopThread();
-        }
-        if (rabbitEffectForMeThread != null) {
-            rabbitEffectForMeThread.effectOff();
-            rabbitEffectForMeThread.stopThread();
-        }
+        String effect, check;
         if (heartTreeEffectForMeThread != null) {
+            effect="heart";
+            check="end";
             heartTreeEffectForMeThread.effectOff();
             heartTreeEffectForMeThread.stopThread();
+            new SenderAsync().execute(url,mToken,effect,sender,check,point);
         }
-        if (heartTreeEffectForOtherThread != null) {
-            heartTreeEffectForOtherThread.effectOff();
-            heartTreeEffectForOtherThread.stopThread();
+        if (mustacheEffectForMeThread != null) {
+            effect="mustache";
+            check="end";
+            mustacheEffectForMeThread.effectOff();
+            mustacheEffectForMeThread.stopThread();
+            new SenderAsync().execute(url,mToken,effect,sender,check,point);
+        }
+
+        if (rabbitEffectForMeThread != null) {
+            effect="rabbit";
+            check="end";
+            rabbitEffectForMeThread.effectOff();
+            rabbitEffectForMeThread.stopThread();
+            new SenderAsync().execute(url,mToken,effect,sender,check,point);
+        }
+
+    }
+    private class SenderAsync extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... data) {
+            String url=data[0];
+            String token=data[1];
+            String effect=data[2];
+            String sender=data[3];
+            String check=data[4];
+            String point=data[5];
+            Utill.requestEffect(url,token,effect,sender,check,point);
+            return null;
         }
     }
 }

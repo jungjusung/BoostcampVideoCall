@@ -1,6 +1,7 @@
 package com.boostcamp.android.facestroy.effect;
 
 import android.content.Context;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -24,8 +25,9 @@ public class Effect extends ImageView {
         this.y = winY - height / 2;
         this.width = width;
         this.heigth = height;
-
+        this.setVisibility(View.GONE);
         params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
         setLayoutParams(params);
     }
 

@@ -64,6 +64,7 @@ public class RabbitEffectForOtherThread extends Thread {
 
 
         effect = new Effect(context, 0, 0, 150, 100);
+        effect.setVisibility(View.INVISIBLE);
 
         Glide.with(context)
                 .load(R.drawable.rabbit)
@@ -71,8 +72,8 @@ public class RabbitEffectForOtherThread extends Thread {
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(effect);
 
-        effect.setVisibility(View.INVISIBLE);
-        param = new RelativeLayout.LayoutParams(2000, 2000);
+
+        param = new RelativeLayout.LayoutParams(10000, 100000);
 
 
         effect.setLayoutParams(param);
@@ -172,12 +173,12 @@ public class RabbitEffectForOtherThread extends Thread {
                 int x2 = 0;
                 for (Landmark landmark : face.getLandmarks()) {
 
-                    if (x1 != 0 && x2 != 0) {
-                        param.width = Math.abs(Math.abs((Math.abs(x2) - Math.abs(x1)))) * 5;
-                        param.height = Math.abs(Math.abs((Math.abs(x2) - Math.abs(x1)))) * 5;
-                        Log.d(TAG, "너비" + Math.abs(Math.abs((Math.abs(x2) - Math.abs(x1)))) * 5);
-                        mLayout.updateViewLayout(effect, param);
-                    }
+//                    if (x1 != 0 && x2 != 0) {
+//                        param.width = Math.abs(Math.abs((Math.abs(x2) - Math.abs(x1)))) * 5;
+//                        param.height = Math.abs(Math.abs((Math.abs(x2) - Math.abs(x1)))) * 5;
+//                        Log.d(TAG, "너비" + Math.abs(Math.abs((Math.abs(x2) - Math.abs(x1)))) * 5);
+//                        mLayout.updateViewLayout(effect, param);
+//                    }
 
                     if (landmark.getType() == Landmark.LEFT_EYE)
                         x1 = ((int) (landmark.getPosition().x * 10));
@@ -188,7 +189,7 @@ public class RabbitEffectForOtherThread extends Thread {
                     if (landmark.getType() == Landmark.NOSE_BASE) {
 
                         effect.setX((int) (landmark.getPosition().x * 10 - 700));
-                        effect.setY((int) (landmark.getPosition().y * 10 - Math.abs(Math.abs((Math.abs(x2) - Math.abs(x1)))) * 5));
+                        effect.setY((int) (landmark.getPosition().y * 10 - 1900));
                         mLayout.updateViewLayout(effect, param);
 
                         //    Log.d(TAG, "인식 x: " + (int) (face.getLandmarks().get(2).getPosition().x * 5) + " y: " + (int) (face.getLandmarks().get(2).getPosition().y * 5));
@@ -204,7 +205,8 @@ public class RabbitEffectForOtherThread extends Thread {
     }
 
     public void effectOff() {
-        effect.setVisibility(View.GONE);
+        effect.setVisibility(View.INVISIBLE);
+
     }
 
     public boolean isRunning() {

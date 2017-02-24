@@ -92,7 +92,7 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
 
         @Override
         public int getCount() {
-            return mRealm.where(Member.class).findAll().size();
+            return list.size();
         }
 
 
@@ -122,10 +122,6 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
             mStatus.setText(member.getStatus());
             mCount.setText(member.getCount() + "회");
             mTime.setText(Utill.timeToString(member.getTime()));
-
-            Log.d(TAG, member.getToken());
-            Log.d(TAG, "포지션" + position);
-            notifyDataSetChanged();
             container.addView(view);
             return view;
         }
@@ -133,6 +129,7 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView((View) object);
+
         }
 
         @Override

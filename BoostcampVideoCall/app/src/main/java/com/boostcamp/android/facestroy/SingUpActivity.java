@@ -42,7 +42,7 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_sign_up);
         token = FirebaseInstanceId.getInstance().getToken();
 
-        Log.d(TAG,token);
+
         mEditName = (EditText) findViewById(R.id.et_name);
         mEditPhone = (EditText) findViewById(R.id.et_phone);
 

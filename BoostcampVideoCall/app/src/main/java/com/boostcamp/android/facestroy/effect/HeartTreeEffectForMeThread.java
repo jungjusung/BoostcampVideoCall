@@ -47,7 +47,7 @@ public class HeartTreeEffectForMeThread extends Thread {
 
     private RelativeLayout mLayout;
     RelativeLayout.LayoutParams param;
-    private Effect effect;
+    public  static Effect effect;
     private int mLocation[]=new int[2];
     private Point mPoint;
 
@@ -82,7 +82,7 @@ public class HeartTreeEffectForMeThread extends Thread {
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(effect);
 
-        effect.setVisibility(View.INVISIBLE);
+        effect.setVisibility(View.GONE);
         param = new RelativeLayout.LayoutParams(200, 220);
 
 
@@ -163,7 +163,7 @@ public class HeartTreeEffectForMeThread extends Thread {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            effect.setVisibility(View.INVISIBLE);
+            effect.setVisibility(View.GONE);
         }
     }
 

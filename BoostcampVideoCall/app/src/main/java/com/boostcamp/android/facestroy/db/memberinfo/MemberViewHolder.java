@@ -4,6 +4,7 @@ import com.boostcamp.android.facestroy.MemberDetailActivity;
 import com.boostcamp.android.facestroy.R;
 import com.boostcamp.android.facestroy.VideoCallActvity;
 import com.boostcamp.android.facestroy.db.Member;
+import com.boostcamp.android.facestroy.db.MyInfo;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
@@ -25,7 +26,7 @@ import io.realm.Realm;
 public class MemberViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
     private TextView mPhoneNumber, mName, mVideoCall,mStatus;
-    private Realm realm;
+    private Realm mRealm;
     private List<Member> mList;
     private MemberAdapter.ListItemClickListener mOnClickListener;
     private Context mContext;
@@ -36,14 +37,15 @@ public class MemberViewHolder extends RecyclerView.ViewHolder implements View.On
     public void onClick(View view) {
         final int clickedPosition = getAdapterPosition();
         mOnClickListener.onListItemClick(clickedPosition);
-        mList = realm.where(Member.class).findAll();
+        mList = mRealm.where(Member.class).findAll();
         Member member=mList.get(clickedPosition);
+        MyInfo myInfo= mRealm.where(MyInfo.class).findFirst();
         switch (view.getId()){
             case R.id.tv_videocall:
                 Intent videoIntent=new Intent(mContext, VideoCallActvity.class);
                 videoIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                videoIntent.putExtra("name",member.getName());
-                videoIntent.putExtra("phoneNumber",member.getPhoneNumber());
+                videoIntent.putExtra("name",myInfo.getName());
+                videoIntent.putExtra("phoneNumber",myInfo.getPhoneNumber());
                 videoIntent.putExtra("token",member.getToken());
                 mContext.startActivity(videoIntent);
                 break;
@@ -60,8 +62,8 @@ public class MemberViewHolder extends RecyclerView.ViewHolder implements View.On
         super(itemView);
         this.mContext =context;
         this.mOnClickListener = mOnClickListener;
-        realm=Realm.getDefaultInstance();
-        mList = realm.where(Member.class).findAll();
+        mRealm =Realm.getDefaultInstance();
+        mList = mRealm.where(Member.class).findAll();
         mImage=(CircleImageView)itemView.findViewById(R.id.cv_image);
         mName = (TextView) itemView.findViewById(R.id.tv_name);
         mPhoneNumber = (TextView) itemView.findViewById(R.id.tv_phone);

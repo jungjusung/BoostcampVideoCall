@@ -45,24 +45,25 @@ import okhttp3.Response;
  * Created by Jusung on 2017. 2. 23..
  */
 
-public class ModMyInfoActivity extends AppCompatActivity implements View.OnClickListener{
+public class ModMyInfoActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG="ModMyInfoActivity";
+    private static final String TAG = "ModMyInfoActivity";
     private static final int REQUEST_CODE_GALLERY = 1;
     private Uri mProfileUri;
     private CircleImageView mCircleGallery, mProfileImage;
     private Realm mRealm;
-    private EditText mName,mStatus;
-    private TextView mOk,mPhoneNumber;
-    private String mImagePath,mImageUrl;
+    private EditText mName, mStatus;
+    private TextView mOk, mPhoneNumber;
+    private String mImagePath, mImageUrl;
     private MyInfo mInfo;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_info);
-        mRealm=Realm.getDefaultInstance();
-        mProfileImage = (CircleImageView)findViewById(R.id.profile_image);
+        mRealm = Realm.getDefaultInstance();
+        mProfileImage = (CircleImageView) findViewById(R.id.profile_image);
         mInfo = mRealm.where(MyInfo.class).findFirst();
 
         Glide.with(getApplicationContext())
@@ -71,24 +72,25 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
                 .error(R.drawable.sample)
                 .into(mProfileImage);
 
-        mCircleGallery = (CircleImageView)findViewById(R.id.cv_gallery);
+        mCircleGallery = (CircleImageView) findViewById(R.id.cv_gallery);
 
-        mName = (EditText)findViewById(R.id.et_name);
+        mName = (EditText) findViewById(R.id.et_name);
         mName.setText(mInfo.getName());
 
-        mStatus = (EditText)findViewById(R.id.et_status);
+        mStatus = (EditText) findViewById(R.id.et_status);
         mStatus.setText(mInfo.getStatus());
 
-        mPhoneNumber=(TextView)findViewById(R.id.tv_phone);
+        mPhoneNumber = (TextView) findViewById(R.id.tv_phone);
         mPhoneNumber.setText(mInfo.getPhoneNumber());
 
-        mOk=(TextView)findViewById(R.id.bt_change_ok);
+        mOk = (TextView) findViewById(R.id.bt_change_ok);
         mOk.setOnClickListener(this);
         mCircleGallery.setOnClickListener(this);
     }
+
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.cv_gallery:
                 getGallery();
                 break;
@@ -98,23 +100,27 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
         }
 
     }
-    public void setEditText(){
-        if(mName.getText().toString().trim().equals("")){
+
+    public void setEditText() {
+        if (mName.getText().toString().trim().equals("")) {
             Toast.makeText(this, "이름을 입력해주세요", Toast.LENGTH_SHORT).show();
             return;
         }
-        mRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                mInfo.setName(mName.getText().toString().trim());
-                mInfo.setStatus(mStatus.getText().toString().trim());
-                if(mImageUrl!=null)
-                    mInfo.setUrl(mImageUrl);
-                realm.copyToRealmOrUpdate(mInfo);
-                Toast.makeText(ModMyInfoActivity.this, "정보가 변경 되었습니다.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        mRealm.beginTransaction();
+        mInfo.setName(mName.getText().toString().trim());
+        mInfo.setStatus(mStatus.getText().toString().trim());
+        Log.d(TAG,"오잉?");
+        if (mImageUrl != null) {
+            Log.d(TAG,"변경? : "+mImageUrl);
+            mInfo.setUrl(mImageUrl);
+        }
+        mRealm.copyToRealmOrUpdate(mInfo);
+        mRealm.commitTransaction();
+        Toast.makeText(ModMyInfoActivity.this, "정보가 변경 되었습니다.", Toast.LENGTH_SHORT).show();
+
+
     }
+
     public void getGallery() {
         Intent intent = null;
         if (Build.VERSION.SDK_INT >= 19) {
@@ -232,8 +238,7 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            mRealm.beginTransaction();
-            mImageUrl=s;
+            mImageUrl = s;
         }
     }
 

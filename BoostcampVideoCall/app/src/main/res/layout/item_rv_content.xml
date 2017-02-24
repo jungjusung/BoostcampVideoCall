@@ -74,6 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="80sp"
             android:layout_weight="1"
+            android:textColor="@color/darkgray"
             android:textSize="12dp"
             android:gravity="start|center_vertical"
             />

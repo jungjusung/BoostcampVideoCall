@@ -141,7 +141,7 @@ public class MustacheEffectForOtherThread extends Thread {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            effect.setVisibility(View.INVISIBLE);
+            effect.setVisibility(View.GONE);
         }
     }
 
@@ -160,7 +160,7 @@ public class MustacheEffectForOtherThread extends Thread {
                 effect.setVisibility(View.VISIBLE);
                 for (Landmark landmark : face.getLandmarks()) {
                     if (landmark.getType() == Landmark.NOSE_BASE) {
-                        effect.setX((int) (landmark.getPosition().x * 10));
+                        effect.setX((int) (landmark.getPosition().x * 10-30));
                         effect.setY((int) (landmark.getPosition().y * 10));
                         mLayout.updateViewLayout(effect, param);
                         break;
@@ -175,8 +175,9 @@ public class MustacheEffectForOtherThread extends Thread {
         interrupt();
     }
     public void effectOff(){
-        effect.setVisibility(View.GONE);
+        effect.setVisibility(View.INVISIBLE);
     }
+
 
     public boolean isRunning(){
         return flag;

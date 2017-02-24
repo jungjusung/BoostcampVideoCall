@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
     protected void onResume() {
         super.onResume();
         mMyInformtaion=mRealm.where(MyInfo.class).findFirst();
-
+//
         Utill.updateMemberToRealm(getApplicationContext());
         initUI();
     }

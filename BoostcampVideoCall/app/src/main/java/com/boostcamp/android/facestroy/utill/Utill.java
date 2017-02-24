@@ -272,7 +272,7 @@ public class Utill {
                                     newMember.setUrl(member.getUrl());
                                 realm.insertOrUpdate(newMember);
                                 realm.commitTransaction();
-                                realm.cancelTransaction();
+
                             }
                         }
                     }
@@ -301,7 +301,7 @@ public class Utill {
             @Override
             public void onResponse(Call<List<Member>> call, final Response<List<Member>> response) {
                 if (response.isSuccessful()) {
-                    realm.executeTransactionAsync(new Realm.Transaction() {
+                    realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
                             final List<Member> list = response.body();
@@ -326,17 +326,19 @@ public class Utill {
         });
     }
 
-    public void requestEffect(String urlString, String token, String effect, String from,String check) {
-        BufferedWriter buffw=null;
+    public static void requestEffect(String urlString, String token, String effect, String sender,String check,String point) {
+
         try {
+            Log.d("Utill","호출됨");
             URL url = new URL(urlString);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setDoInput(true);
             con.setDoOutput(true);
 
-            buffw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
-            buffw.write("token=" + token + "&effect=" + effect + "&from=" + from+"&check="+check);
+            BufferedWriter buffw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+            buffw.write("token=" + token + "&effect=" + effect + "&sender=" + sender+"&check="+check+"&point="+point);
+            Log.d("Utill","token=" + token + "&effect=" + effect + "&sender=" + sender+"&check="+check+"&point="+point);
             buffw.flush();
             con.getResponseCode();
             con.disconnect();
@@ -346,13 +348,6 @@ public class Utill {
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
-            if(buffw!=null) {
-                try {
-                    buffw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 

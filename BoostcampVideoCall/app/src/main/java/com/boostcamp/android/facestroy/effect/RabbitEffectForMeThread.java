@@ -201,7 +201,7 @@ public class RabbitEffectForMeThread extends Thread {
         interrupt();
     }
     public void effectOff(){
-        effect.setVisibility(View.GONE);
+        effect.setVisibility(View.INVISIBLE);
     }
 
     public boolean isRunning(){

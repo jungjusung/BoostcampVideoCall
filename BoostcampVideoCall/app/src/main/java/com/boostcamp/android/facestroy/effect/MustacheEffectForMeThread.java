@@ -69,7 +69,7 @@ public class MustacheEffectForMeThread extends Thread {
 
         effect = new Effect(context, mLocation[0], mLocation[1], 150, 100);
         effect.setBackgroundResource(R.drawable.effect1);
-        effect.setVisibility(View.INVISIBLE);
+        effect.setVisibility(View.GONE);
         param = new RelativeLayout.LayoutParams(250, 120);
 
 
@@ -150,7 +150,7 @@ public class MustacheEffectForMeThread extends Thread {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            effect.setVisibility(View.INVISIBLE);
+            effect.setVisibility(View.GONE);
         }
     }
 
