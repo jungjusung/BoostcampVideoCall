@@ -61,8 +61,8 @@
                 android:layout_width="240dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle_gray"
-                android:paddingLeft="25dp"
                 android:hint="이름을 입력하세요"
+                android:paddingLeft="25dp"
                 android:textColorHint="@android:color/white"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
@@ -112,9 +112,22 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle_gray"
                 android:paddingLeft="25dp"
-                android:text="010-5145-2554"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
         </LinearLayout>
+        <TextView
+            android:id="@+id/bt_change_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/change_item"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:layout_marginTop="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:textColor="@color/darkgray"
+            android:background="@drawable/border_color"
+            />
     </LinearLayout>
 </FrameLayout>

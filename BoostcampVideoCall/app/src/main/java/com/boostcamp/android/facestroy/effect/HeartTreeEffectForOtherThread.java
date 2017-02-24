@@ -200,9 +200,20 @@ public class HeartTreeEffectForOtherThread extends Thread {
         interrupt();
     }
     public void effectOff(){
-        effect.setVisibility(View.INVISIBLE);
+        effect.setVisibility(View.GONE);
     }
 
+    public boolean isRunning(){
+        return flag;
+    }
+
+    public void effectOn(){
+        effect.setVisibility(View.VISIBLE);
+    }
+    public void restartThread(){
+        flag=true;
+        interrupt();
+    }
 }
 
 

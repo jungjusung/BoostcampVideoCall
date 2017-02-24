@@ -272,6 +272,7 @@ public class Utill {
                                     newMember.setUrl(member.getUrl());
                                 realm.insertOrUpdate(newMember);
                                 realm.commitTransaction();
+                                realm.cancelTransaction();
                             }
                         }
                     }
@@ -298,21 +299,24 @@ public class Utill {
 
         memberList.enqueue(new Callback<List<Member>>() {
             @Override
-            public void onResponse(Call<List<Member>> call, Response<List<Member>> response) {
+            public void onResponse(Call<List<Member>> call, final Response<List<Member>> response) {
                 if (response.isSuccessful()) {
-                    realm.beginTransaction();
-                    final List<Member> list = response.body();
-                    for (Member member : list) {
+                    realm.executeTransactionAsync(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            final List<Member> list = response.body();
+                            for (Member member : list) {
 
-                        Member nMember = realm.where(Member.class).equalTo("token", member.getToken()).findFirst();
-                        if (nMember != null) {
-                            Log.d("Utill", member.getUrl());
-                            nMember.setUrl(member.getUrl());
-                            nMember.setStatus(member.getStatus());
-                            realm.insertOrUpdate(nMember);
+                                Member nMember = realm.where(Member.class).equalTo("token", member.getToken()).findFirst();
+                                if (nMember != null) {
+                                    Log.d("Utill", member.getUrl());
+                                    nMember.setUrl(member.getUrl());
+                                    nMember.setStatus(member.getStatus());
+                                    realm.insertOrUpdate(nMember);
+                                }
+                            }
                         }
-                    }
-                    realm.commitTransaction();
+                    });
                 }
             }
 
@@ -322,8 +326,8 @@ public class Utill {
         });
     }
 
-    public void requestEffect(String urlString, String token, String effect, String from) {
-
+    public void requestEffect(String urlString, String token, String effect, String from,String check) {
+        BufferedWriter buffw=null;
         try {
             URL url = new URL(urlString);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -331,8 +335,8 @@ public class Utill {
             con.setDoInput(true);
             con.setDoOutput(true);
 
-            BufferedWriter buffw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
-            buffw.write("token=" + token + "&effect=" + effect + "&from" + from);
+            buffw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+            buffw.write("token=" + token + "&effect=" + effect + "&from=" + from+"&check="+check);
             buffw.flush();
             con.getResponseCode();
             con.disconnect();
@@ -341,6 +345,14 @@ public class Utill {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            if(buffw!=null) {
+                try {
+                    buffw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

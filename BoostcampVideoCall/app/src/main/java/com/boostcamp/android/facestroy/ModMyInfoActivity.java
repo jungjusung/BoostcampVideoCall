@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.boostcamp.android.facestroy.db.MyInfo;
 import com.boostcamp.android.facestroy.utill.Utill;
@@ -51,7 +53,9 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
     private CircleImageView mCircleGallery, mProfileImage;
     private Realm mRealm;
     private EditText mName,mStatus;
-    private String mImagePath;
+    private TextView mOk,mPhoneNumber;
+    private String mImagePath,mImageUrl;
+    private MyInfo mInfo;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(R.style.myNoActionBar);
@@ -59,26 +63,57 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
         setContentView(R.layout.activity_my_info);
         mRealm=Realm.getDefaultInstance();
         mProfileImage = (CircleImageView)findViewById(R.id.profile_image);
-        MyInfo info = mRealm.where(MyInfo.class).findFirst();
+        mInfo = mRealm.where(MyInfo.class).findFirst();
 
         Glide.with(getApplicationContext())
-                .load(info.getUrl())
+                .load(mInfo.getUrl())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .error(R.drawable.sample)
                 .into(mProfileImage);
 
         mCircleGallery = (CircleImageView)findViewById(R.id.cv_gallery);
-        mName = (EditText)findViewById(R.id.et_name);
-        mStatus = (EditText)findViewById(R.id.et_status);
 
+        mName = (EditText)findViewById(R.id.et_name);
+        mName.setText(mInfo.getName());
+
+        mStatus = (EditText)findViewById(R.id.et_status);
+        mStatus.setText(mInfo.getStatus());
+
+        mPhoneNumber=(TextView)findViewById(R.id.tv_phone);
+        mPhoneNumber.setText(mInfo.getPhoneNumber());
+
+        mOk=(TextView)findViewById(R.id.bt_change_ok);
+        mOk.setOnClickListener(this);
         mCircleGallery.setOnClickListener(this);
     }
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.cv_gallery) {
-            getGallery();
+        switch (view.getId()){
+            case R.id.cv_gallery:
+                getGallery();
+                break;
+            case R.id.bt_change_ok:
+                setEditText();
+                break;
         }
 
+    }
+    public void setEditText(){
+        if(mName.getText().toString().trim().equals("")){
+            Toast.makeText(this, "이름을 입력해주세요", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                mInfo.setName(mName.getText().toString().trim());
+                mInfo.setStatus(mStatus.getText().toString().trim());
+                if(mImageUrl!=null)
+                    mInfo.setUrl(mImageUrl);
+                realm.copyToRealmOrUpdate(mInfo);
+                Toast.makeText(ModMyInfoActivity.this, "정보가 변경 되었습니다.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     public void getGallery() {
         Intent intent = null;
@@ -198,11 +233,7 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             mRealm.beginTransaction();
-            MyInfo info = mRealm.where(MyInfo.class).findFirst();
-            info.setUrl(s);
-            mRealm.copyToRealmOrUpdate(info);
-            mRealm.commitTransaction();
-            Glide.with(getApplicationContext()).load(info.getUrl()).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProfileImage);
+            mImageUrl=s;
         }
     }
 

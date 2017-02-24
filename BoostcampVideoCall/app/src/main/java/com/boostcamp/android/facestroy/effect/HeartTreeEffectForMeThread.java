@@ -186,8 +186,8 @@ public class HeartTreeEffectForMeThread extends Thread {
                         int x=mPoint.x-(int)(mLayout.getWidth()*0.3)-MARGIN;
                         int y=mPoint.y-(int)(mLayout.getHeight()*0.3)-MARGIN;
 
-                        effect.setX((int) (x+landmark.getPosition().x*2 ));
-                        effect.setY((int) (landmark.getPosition().y*2 ));
+                        effect.setX((int) (x+landmark.getPosition().x*2-100 ));
+                        effect.setY((int) (landmark.getPosition().y*2 )-300);
                         mLayout.updateViewLayout(effect, param);
 
                         //    Log.d(TAG, "인식 x: " + (int) (face.getLandmarks().get(2).getPosition().x * 5) + " y: " + (int) (face.getLandmarks().get(2).getPosition().y * 5));
@@ -201,9 +201,20 @@ public class HeartTreeEffectForMeThread extends Thread {
         interrupt();
     }
     public void effectOff(){
-        effect.setVisibility(View.INVISIBLE);
+        effect.setVisibility(View.GONE);
     }
 
+    public boolean isRunning(){
+        return flag;
+    }
+
+    public void effectOn(){
+        effect.setVisibility(View.VISIBLE);
+    }
+    public void restartThread(){
+        flag=true;
+        interrupt();
+    }
 }
 
 

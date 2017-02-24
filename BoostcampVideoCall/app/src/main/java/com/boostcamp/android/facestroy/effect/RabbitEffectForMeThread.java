@@ -1,20 +1,22 @@
 package com.boostcamp.android.facestroy.effect;
 
-import com.boostcamp.android.facestroy.R;
-import com.boostcamp.android.facestroy.SafeFaceDetector;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+import com.boostcamp.android.facestroy.R;
+import com.boostcamp.android.facestroy.SafeFaceDetector;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
@@ -29,11 +31,11 @@ import java.util.Queue;
  * Created by Jusung on 2017. 2. 14..
  */
 
-public class MustacheEffectForMeThread extends Thread {
+public class RabbitEffectForMeThread extends Thread {
 
     private PlayRTCVideoView localView;
     private static final int MARGIN=30;
-    private static final String TAG = "MustacheEffectForMeThread";
+    private static final String TAG = "RabbitEffect";
     private PlayRTCVideoView remoteView;
     private Bitmap mBitmap;
     private Context context;
@@ -42,17 +44,19 @@ public class MustacheEffectForMeThread extends Thread {
     Detector<Face> safeDetector;
     Queue<Bitmap> bitmapQueue = new LinkedList<>();
     Queue<Face> faceQueue = new LinkedList<>();
-    private WindowManager windowManager;
+
     private RelativeLayout mLayout;
     RelativeLayout.LayoutParams param;
     private Effect effect;
     private int mLocation[]=new int[2];
     private Point mPoint;
-    public MustacheEffectForMeThread(PlayRTCVideoView localView, PlayRTCVideoView remoteView, Context context, RelativeLayout relativeLayout) {
+
+    public RabbitEffectForMeThread(PlayRTCVideoView localView, PlayRTCVideoView remoteView, Context context, RelativeLayout relativeLayout) {
         this.localView = localView;
         this.remoteView = remoteView;
         this.context = context;
         mLayout = relativeLayout;
+
         WindowManager wm = (WindowManager)    context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         mPoint=new Point();
@@ -67,10 +71,19 @@ public class MustacheEffectForMeThread extends Thread {
                 .build();
         safeDetector = new SafeFaceDetector(faceDetector);
 
-        effect = new Effect(context, mLocation[0], mLocation[1], 150, 100);
-        effect.setBackgroundResource(R.drawable.effect1);
+
+
+
+        effect = new Effect(context,0,0, 150, 100);
+
+        Glide.with(context)
+                .load(R.drawable.rabbit)
+                .asGif()
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(effect);
+
         effect.setVisibility(View.INVISIBLE);
-        param = new RelativeLayout.LayoutParams(250, 120);
+        param = new RelativeLayout.LayoutParams(700, 730);
 
 
         effect.setLayoutParams(param);
@@ -84,7 +97,6 @@ public class MustacheEffectForMeThread extends Thread {
         while (flag) {
             try {
                 if (localView != null) {
-
                     makeSanpshot();
                     detectSnapShot();
                     sleep(50);
@@ -121,7 +133,8 @@ public class MustacheEffectForMeThread extends Thread {
             return;
 
 
-        myBitmap = Bitmap.createScaledBitmap(myBitmap, myBitmap.getWidth() / 10, myBitmap.getHeight() / 10, true);
+        Log.d(TAG,myBitmap.getWidth()+" "+myBitmap.getHeight());
+        myBitmap = Bitmap.createScaledBitmap(myBitmap, myBitmap.getWidth()/2, myBitmap.getHeight()/2, true);
         Frame frame = new Frame.Builder().setBitmap(myBitmap).build();
         SparseArray<Face> faces = safeDetector.detect(frame);
         myBitmap.recycle();
@@ -168,13 +181,15 @@ public class MustacheEffectForMeThread extends Thread {
             if (face != null) {
                 effect.setVisibility(View.VISIBLE);
                 for (Landmark landmark : face.getLandmarks()) {
+
                     if (landmark.getType() == Landmark.NOSE_BASE) {
                         int x=mPoint.x-(int)(mLayout.getWidth()*0.3)-MARGIN;
                         int y=mPoint.y-(int)(mLayout.getHeight()*0.3)-MARGIN;
-                        effect.setX((int) (x+landmark.getPosition().x * 10));
-                        effect.setY((int) (landmark.getPosition().y * 10));
+
+                        effect.setX((int) (x+landmark.getPosition().x*2-330 ));
+                        effect.setY((int) (landmark.getPosition().y*2 )-530);
                         mLayout.updateViewLayout(effect, param);
-                        break;
+
                         //    Log.d(TAG, "인식 x: " + (int) (face.getLandmarks().get(2).getPosition().x * 5) + " y: " + (int) (face.getLandmarks().get(2).getPosition().y * 5));
                     }
                 }

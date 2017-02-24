@@ -20,12 +20,13 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.boostcamp.android.facestroy.effect.HeartTreeEffectForMeThread;
 import com.boostcamp.android.facestroy.effect.HeartTreeEffectForOtherThread;
 import com.boostcamp.android.facestroy.effect.MustacheEffectForMeThread;
 import com.boostcamp.android.facestroy.effect.MustacheEffectForOtherThread;
+import com.boostcamp.android.facestroy.effect.RabbitEffectForMeThread;
+import com.boostcamp.android.facestroy.effect.RabbitEffectForOtherThread;
 import com.boostcamp.android.facestroy.utill.Utill;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -50,6 +51,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import io.realm.Realm;
 
@@ -60,8 +63,13 @@ import io.realm.Realm;
 public class VideoCallActvity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
 
 
-    public static final String TAG="VideoCallActvity";
+    private static final String TAG = "VideoCallActvity";
     private static final String KEY = "60ba608a-e228-4530-8711-fa38004719c1";
+    private static final int EFFECT_TREEHEART=0;
+    private static final int EFFECT_MUSTACHE=1;
+    private static final int EFFECT_RABBIT=2;
+
+
     private PlayRTCObserver playrtcObserver = null;
     private PlayRTC playrtc = null;
 
@@ -85,12 +93,16 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     private RelativeLayout mMenuButton;
     private RelativeLayout mEffectButton;
     private LinearLayout mBtnExit, mBtnEffect, mBtnRotation;
-    private LinearLayout mEffect1, mEffect3;
+    private LinearLayout mEffectHeart, mEffectRabbit, mEffectMustache, mEffectExit;
+    private List<LinearLayout> mEffectList =new LinkedList<>();
     private int mLocation[] = new int[2];
+    private RelativeLayout myVideoViewGroup;
     public static MustacheEffectForMeThread mustacheEffectForMeThread;
     public static MustacheEffectForOtherThread mustacheEffectForOtherThread;
     public static HeartTreeEffectForOtherThread heartTreeEffectForOtherThread;
-    private HeartTreeEffectForMeThread heartTreeEffectForMeThread;
+    public static HeartTreeEffectForMeThread heartTreeEffectForMeThread;
+    public static RabbitEffectForOtherThread rabbitEffectForOtherThread;
+    public static RabbitEffectForMeThread rabbitEffectForMeThread;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,7 +115,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         mMenuButton.bringToFront();
         mEffectButton.bringToFront();
 
-        mPlayer=new MediaPlayer();
+        mPlayer = new MediaPlayer();
         mContext = getApplication();
         mEndCall = (ShimmerFrameLayout) findViewById(R.id.shimmer_end_call);
         mEndCall.setDuration(2000);
@@ -116,10 +128,20 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         mBtnRotation = (LinearLayout) findViewById(R.id.btn_rotation);
 
 
-        mEffect1 = (LinearLayout) findViewById(R.id.btn_effect1);
-        mEffect3 = (LinearLayout) findViewById(R.id.btn_effect3);
-        mEffect1.setOnClickListener(this);
-        mEffect3.setOnClickListener(this);
+        mEffectHeart = (LinearLayout) findViewById(R.id.effect_heartTree);
+        mEffectMustache = (LinearLayout) findViewById(R.id.effect_mustache);
+        mEffectRabbit = (LinearLayout) findViewById(R.id.effect_rabbit);
+        mEffectExit = (LinearLayout) findViewById(R.id.btn_effect_exit);
+
+        mEffectList.add(mEffectHeart);
+        mEffectList.add(mEffectMustache);
+        mEffectList.add(mEffectRabbit);
+        mEffectHeart.setOnClickListener(this);
+        mEffectRabbit.setOnClickListener(this);
+        mEffectMustache.setOnClickListener(this);
+        mEffectExit.setOnClickListener(this);
+
+
         mBtnEffect.setOnClickListener(this);
         mBtnExit.setOnClickListener(this);
         mBtnRotation.setOnClickListener(this);
@@ -135,7 +157,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         Log.d(TAG, "비디오뷰생성");
         createPlayRTCInstance();
         createChannel(myInfo.getToken());
-        Utill.startRingtone(mContext,mPlayer);
+        Utill.startRingtone(mContext, mPlayer);
     }
 
 
@@ -196,19 +218,20 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
 
                 long delayTime = 0;
                 localView.show(delayTime);
-                Toast.makeText(VideoCallActvity.this, "로컬", Toast.LENGTH_SHORT).show();
                 // Link the media stream to the view.
                 playRTCMedia.setVideoRenderer(localView.getVideoRenderer());
 
-                RelativeLayout myVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
+                myVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
                 if (localView != null) {
 
                     //애니메이션 효과 있을시
-//                    mustacheEffectForMeThread = new MustacheEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+
 //                    mustacheEffectForOtherThread = new MustacheEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
 //                    heartTreeEffectForOtherThread= new HeartTreeEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
-                    heartTreeEffectForMeThread= new HeartTreeEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
-
+//                     rabbitEffectForOtherThread = new RabbitEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
+                    heartTreeEffectForMeThread = new HeartTreeEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+                    mustacheEffectForMeThread = new MustacheEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+                    rabbitEffectForMeThread=new RabbitEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
                 }
                 localView.getHolder().addCallback(new SurfaceCallback());
             }
@@ -218,7 +241,6 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 changeLocalVidoeView();
                 long delayTime = 100;
                 remoteView.show(delayTime);
-                Toast.makeText(VideoCallActvity.this, "리모트", Toast.LENGTH_SHORT).show();
                 mEndCall.setVisibility(View.INVISIBLE);
                 // Link the media stream to the view.
                 playRTCMedia.setVideoRenderer(remoteView.getVideoRenderer());
@@ -363,13 +385,10 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     }
 
     public void callToPeer(String channelId) {
-        Toast.makeText(mContext, "전화걸기!!", Toast.LENGTH_SHORT).show();
         String name = mName;
         String token = mToken;
         String phoneNumber = mPhoneNumber;
         String channel = channelId;
-
-        Toast.makeText(mContext, token, Toast.LENGTH_SHORT).show();
         sendFcmInDevice(name, token, phoneNumber, channel);
     }
 
@@ -380,17 +399,21 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
 
+        if (mEffectButton.getVisibility() == View.VISIBLE) {
+            mEffectButton.setVisibility(View.GONE);
 
-        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        } else {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
 
-            if (mMenuButton.getVisibility() == View.GONE) {
-                mMenuButton.setVisibility(View.VISIBLE);
-            } else if (mMenuButton.getVisibility() == View.INVISIBLE) {
-                mMenuButton.setVisibility(View.VISIBLE);
-            } else {
-                mMenuButton.setVisibility(View.INVISIBLE);
+                if (mMenuButton.getVisibility() == View.GONE) {
+                    mMenuButton.setVisibility(View.VISIBLE);
+                } else if (mMenuButton.getVisibility() == View.INVISIBLE) {
+                    mMenuButton.setVisibility(View.VISIBLE);
+                } else {
+                    mMenuButton.setVisibility(View.INVISIBLE);
+                }
+                return true;
             }
-            return true;
         }
         return super.onTouchEvent(motionEvent);
     }
@@ -409,6 +432,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             return null;
         }
     }
+
     public void requestFCM(String name, String token, String phoneNumber, String urlString, String channelId) {
 
         try {
@@ -466,26 +490,54 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             case R.id.btn_rotation:
                 //전환
                 break;
-            case R.id.btn_effect1:
-//                mustacheEffectForMeThread.start();
-//                mustacheEffectForOtherThread.start();
-                heartTreeEffectForMeThread.start();
-                mEffectButton.setVisibility(View.INVISIBLE);
+            case R.id.effect_heartTree:
+                //쓰레드 종료 재시작 로직!!!
+                if (heartTreeEffectForMeThread.getState() == Thread.State.NEW) {
+                    heartTreeEffectForMeThread.start();
+                } else if (heartTreeEffectForMeThread.getState() == Thread.State.RUNNABLE) {
+                    heartTreeEffectForMeThread.effectOff();
+                    heartTreeEffectForMeThread.stopThread();
+                }else if(heartTreeEffectForMeThread.getState() == Thread.State.TERMINATED){
+                    heartTreeEffectForMeThread.effectOn();
+                    heartTreeEffectForMeThread.restartThread();
+                }
+                btnSetEnabled(EFFECT_TREEHEART);
                 break;
-            case R.id.btn_effect3:
-                mustacheEffectForMeThread.effectOff();
-                mustacheEffectForMeThread.stopThread();
-
-                mustacheEffectForOtherThread.effectOff();
-                mustacheEffectForOtherThread.stopThread();
+            case R.id.effect_mustache:
+                if (mustacheEffectForMeThread.getState() == Thread.State.NEW) {
+                    mustacheEffectForMeThread.start();
+                } else if (mustacheEffectForMeThread.getState() == Thread.State.RUNNABLE) {
+                    mustacheEffectForMeThread.effectOff();
+                    mustacheEffectForMeThread.stopThread();
+                }else if(mustacheEffectForMeThread.getState() == Thread.State.TERMINATED){
+                    mustacheEffectForMeThread.effectOn();
+                    mustacheEffectForMeThread.restartThread();
+                }
+                btnSetEnabled(EFFECT_MUSTACHE);
+                break;
+            case R.id.effect_rabbit:
+                if (rabbitEffectForMeThread.getState() == Thread.State.NEW) {
+                    rabbitEffectForMeThread.start();
+                } else if (rabbitEffectForMeThread.getState() == Thread.State.RUNNABLE) {
+                    rabbitEffectForMeThread.effectOff();
+                    rabbitEffectForMeThread.stopThread();
+                }else if(rabbitEffectForMeThread.getState() == Thread.State.TERMINATED){
+                    rabbitEffectForMeThread=new RabbitEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+                    rabbitEffectForMeThread.start();
+                }
+                btnSetEnabled(EFFECT_RABBIT);
+                break;
+            case R.id.btn_effect_exit:
+                exitThread();
+                allBtnSetEnabled();
                 break;
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mustacheEffectForMeThread.effectOff();
-        mustacheEffectForMeThread.stopThread();
+        exitThread();
         Utill.stopRington(mPlayer);
 
         playrtc.close();
@@ -508,8 +560,8 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         callLog.setId(sequenceNum);
         callLog.setDate(mDate);
         callLog.setTo(FirebaseInstanceId.getInstance().getToken());
-        Log.d(TAG,"To:"+FirebaseInstanceId.getInstance().getToken());
-        Log.d(TAG,"To:"+mToken);
+        Log.d(TAG, "To:" + FirebaseInstanceId.getInstance().getToken());
+        Log.d(TAG, "To:" + mToken);
         callLog.setFrom(mToken);
         callLog.setTime(time);
         mRealm.insert(callLog);
@@ -522,12 +574,11 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     private class SurfaceCallback implements SurfaceHolder.Callback {
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
-            Log.d(TAG, "생성됨");
+
         }
 
         @Override
         public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
-            Log.d(TAG, "변경됨");
 
         }
 
@@ -536,5 +587,45 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
 
         }
     }
+    public void btnSetEnabled(int flag){
+        for(int i=0;i<mEffectList.size();i++){
+            if(flag==i)
+                mEffectList.get(i).setEnabled(true);
 
+            mEffectList.get(i).setEnabled(false);
+        }
+    }
+    public void allBtnSetEnabled(){
+        for(LinearLayout btn:mEffectList)
+            btn.setEnabled(true);
+    }
+
+    public void exitThread() {
+        if (mustacheEffectForMeThread != null) {
+            mustacheEffectForMeThread.effectOff();
+            mustacheEffectForMeThread.stopThread();
+        }
+
+        if (mustacheEffectForOtherThread != null) {
+            mustacheEffectForOtherThread.effectOff();
+            mustacheEffectForOtherThread.stopThread();
+        }
+
+        if (rabbitEffectForOtherThread != null) {
+            rabbitEffectForOtherThread.effectOff();
+            rabbitEffectForOtherThread.stopThread();
+        }
+        if (rabbitEffectForMeThread != null) {
+            rabbitEffectForMeThread.effectOff();
+            rabbitEffectForMeThread.stopThread();
+        }
+        if (heartTreeEffectForMeThread != null) {
+            heartTreeEffectForMeThread.effectOff();
+            heartTreeEffectForMeThread.stopThread();
+        }
+        if (heartTreeEffectForOtherThread != null) {
+            heartTreeEffectForOtherThread.effectOff();
+            heartTreeEffectForOtherThread.stopThread();
+        }
+    }
 }
