@@ -36,7 +36,7 @@
 
     <application
 
-        android:name="com.boostcamp.android.facestroy.utill.RealmInit"
+        android:name=".utill.RealmInit"
         android:allowBackup="true"
         android:largeHeap="true"
         android:icon="@mipmap/ic_launcher"
@@ -51,30 +51,30 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="face" />
 
-        <activity android:name="com.boostcamp.android.facestroy.PermissionCheckActivity">
+        <activity android:name=".activity.PermissionCheckActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.boostcamp.android.facestroy.SplashActivity" />
-        <activity android:name="com.boostcamp.android.facestroy.MainActivity" />
+        <activity android:name=".activity.SplashActivity" />
+        <activity android:name=".activity.MainActivity" />
         <activity
-            android:name="com.boostcamp.android.facestroy.SingUpActivity"
+            android:name=".activity.SingUpActivity"
             android:windowSoftInputMode="adjustUnspecified" />
-        <activity android:name="com.boostcamp.android.facestroy.VideoCallActvity" />
-        <activity android:name="com.boostcamp.android.facestroy.ReceiveCheckActivity" />
-        <activity android:name="com.boostcamp.android.facestroy.ReceiveCallActivity" />
-        <activity android:name="com.boostcamp.android.facestroy.MemberDetailActivity"/>
-        <activity android:name=".ModMyInfoActivity"/>
+        <activity android:name=".activity.VideoCallActvity" />
+        <activity android:name=".activity.ReceiveCheckActivity" />
+        <activity android:name=".activity.ReceiveCallActivity" />
+        <activity android:name=".activity.MemberDetailActivity"/>
+        <activity android:name=".activity.ModMyInfoActivity"/>
 
-        <service android:name="com.boostcamp.android.facestroy.MyFirebaseMessagingService">
+        <service android:name=".service.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <service android:name="com.boostcamp.android.facestroy.MyFirebaseInstanceIDService">
+        <service android:name=".service.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>

@@ -1,10 +1,12 @@
-package com.boostcamp.android.facestroy;
+package com.boostcamp.android.facestroy.activity;
 
+import com.boostcamp.android.facestroy.R;
 import com.boostcamp.android.facestroy.db.CallLog;
 import com.boostcamp.android.facestroy.db.Member;
 import com.boostcamp.android.facestroy.db.MyInfo;
 import com.boostcamp.android.facestroy.db.calllog.CallLogAdapter;
 import com.boostcamp.android.facestroy.db.memberinfo.MemberAdapter;
+import com.boostcamp.android.facestroy.utill.Constant;
 import com.boostcamp.android.facestroy.utill.Utill;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -21,12 +23,10 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -43,27 +43,24 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
     private static final String TAG = "MainActivity";
 
     private ViewPager mViewPager;
-    private static final int VIEW_PAGER_SIZE = 3;
 
-    private NavigationTabBar navigationTabBar;
-    private Realm mRealm;
-    private int[] icons = {R.drawable.ic_contacts, R.drawable.ic_video_call, R.drawable.ic_theaters};
-    private String[] colors = {"#f9bb72", "#dd6495", "#72d3b4"};
-    private String[] titles = {"연락처", "통화기록", "기록"};
-
-
+    private NavigationTabBar mNavigationTabBar;
+    private AppBarLayout mAppbar;
     private CollapsingToolbarLayout mToolbar;
-    //profile 변경관련
     private CircleImageView mMyImage;
     private TextView mMyName,mMyStatus;
 
 
-    private AppBarLayout mAppbar;
+    private int[] mIcon = {R.drawable.ic_contacts, R.drawable.ic_video_call, R.drawable.ic_theaters};
+    private String[] mColor = {getString(R.string.first_color),getString(R.string.second_color),getString(R.string.third_color)};
+    private String[] mTitles = {getString(R.string.phone),getString(R.string.history), getString(R.string.record)};
+
+    private Realm mRealm;
     private MyInfo mMyInformtaion;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
+        setTheme(R.style.myNoActionBar);
         setContentView(R.layout.activity_main);
         mRealm = Realm.getDefaultInstance();
 
@@ -71,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
 
     public void initUI() {
         mViewPager = (ViewPager) findViewById(R.id.vp_list);
-        navigationTabBar = (NavigationTabBar) findViewById(R.id.nav_facestory);
+        mNavigationTabBar = (NavigationTabBar) findViewById(R.id.nav_facestory);
         mToolbar=(CollapsingToolbarLayout)findViewById(R.id.toolbar);
         mAppbar=(AppBarLayout)findViewById(R.id.appbar_facestory);
         CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)mAppbar.getLayoutParams();
@@ -115,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
         mViewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
-                return VIEW_PAGER_SIZE;
+                return Constant.VIEW_PAGER_SIZE;
             }
 
             @Override
@@ -150,11 +147,6 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
 
                 if (position == 0) {
                     final RealmResults<Member> list = mRealm.where(Member.class).findAll();
-                    for (Member call : list) {
-                        Log.d(TAG,call.getUrl()+"");
-                        Log.d(TAG, call.getTime() + "");
-                        Log.d(TAG, call.getCount() + "");
-                    }
                     recyclerViewMember.setAdapter(new MemberAdapter(getApplicationContext(), MainActivity.this, list, true));
 
                     container.addView(viewMember);
@@ -173,26 +165,26 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
 
 
         final ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
-        for (int i = 0; i < VIEW_PAGER_SIZE; i++) {
+        for (int i = 0; i < Constant.VIEW_PAGER_SIZE; i++) {
 
             if (android.os.Build.VERSION.SDK_INT >= 21) {
                 models.add(new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(icons[i], null),
-                        Color.parseColor(colors[i]))
-                        .title(titles[i])
+                        getResources().getDrawable(mIcon[i], null),
+                        Color.parseColor(mColor[i]))
+                        .title(mTitles[i])
                         .build());
             } else {
                 models.add(new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(icons[i]),
-                        Color.parseColor(colors[i]))
-                        .title(titles[i])
+                        getResources().getDrawable(mIcon[i]),
+                        Color.parseColor(mColor[i]))
+                        .title(mTitles[i])
                         .build());
             }
         }
-        navigationTabBar.setModels(models);
-        navigationTabBar.setViewPager(mViewPager, 0);
-        navigationTabBar.setBehaviorEnabled(true);
-        navigationTabBar.setOnTabBarSelectedIndexListener(new NavigationTabBar.OnTabBarSelectedIndexListener() {
+        mNavigationTabBar.setModels(models);
+        mNavigationTabBar.setViewPager(mViewPager, 0);
+        mNavigationTabBar.setBehaviorEnabled(true);
+        mNavigationTabBar.setOnTabBarSelectedIndexListener(new NavigationTabBar.OnTabBarSelectedIndexListener() {
             @Override
             public void onStartTabSelected(final NavigationTabBar.Model model, final int index) {
             }
@@ -202,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
                 model.hideBadge();
             }
         });
-        navigationTabBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mNavigationTabBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
             }

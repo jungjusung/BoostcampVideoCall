@@ -1,4 +1,4 @@
-package com.boostcamp.android.facestroy;
+package com.boostcamp.android.facestroy.activity;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -16,7 +16,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.boostcamp.android.facestroy.R;
 import com.boostcamp.android.facestroy.db.MyInfo;
+import com.boostcamp.android.facestroy.utill.Constant;
 import com.boostcamp.android.facestroy.utill.Utill;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -48,8 +50,7 @@ import okhttp3.Response;
 public class ModMyInfoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ModMyInfoActivity";
-    private static final int REQUEST_CODE_GALLERY = 1;
-    private Uri mProfileUri;
+
     private CircleImageView mCircleGallery, mProfileImage;
     private Realm mRealm;
     private EditText mName, mStatus;
@@ -57,10 +58,12 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
     private String mImagePath, mImageUrl;
     private MyInfo mInfo;
 
+    private Uri mProfileUri;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
+        setTheme(R.style.myNoActionBar);
         setContentView(R.layout.activity_my_info);
         mRealm = Realm.getDefaultInstance();
         mProfileImage = (CircleImageView) findViewById(R.id.profile_image);
@@ -103,26 +106,23 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
 
     public void setEditText() {
         if (mName.getText().toString().trim().equals("")) {
-            Toast.makeText(this, "이름을 입력해주세요", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.name_check), Toast.LENGTH_SHORT).show();
             return;
         }
         mRealm.beginTransaction();
         mInfo.setName(mName.getText().toString().trim());
         mInfo.setStatus(mStatus.getText().toString().trim());
-        Log.d(TAG,"오잉?");
         if (mImageUrl != null) {
-            Log.d(TAG,"변경? : "+mImageUrl);
             mInfo.setUrl(mImageUrl);
         }
         mRealm.copyToRealmOrUpdate(mInfo);
         mRealm.commitTransaction();
-        Toast.makeText(ModMyInfoActivity.this, "정보가 변경 되었습니다.", Toast.LENGTH_SHORT).show();
-
+        Toast.makeText(ModMyInfoActivity.this, getResources().getString(R.string.info_change), Toast.LENGTH_SHORT).show();
 
     }
 
     public void getGallery() {
-        Intent intent = null;
+        Intent intent;
         if (Build.VERSION.SDK_INT >= 19) {
             intent = new Intent(Intent.ACTION_PICK);
             intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
@@ -130,7 +130,7 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
             intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
         }
-        startActivityForResult(intent, REQUEST_CODE_GALLERY);
+        startActivityForResult(intent, Constant.REQUEST_CODE_GALLERY);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
         if (resultCode != RESULT_OK)
             return;
 
-        if (requestCode == REQUEST_CODE_GALLERY) {
+        if (requestCode == Constant.REQUEST_CODE_GALLERY) {
             mProfileUri = data.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Cursor cursor = getContentResolver().query(mProfileUri, filePathColumn, null, null, null);
@@ -148,7 +148,6 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             mImagePath = cursor.getString(columnIndex);
-            // Set the Image in ImageView for Previewing the Media
             mProfileImage.setImageBitmap(BitmapFactory.decodeFile(mImagePath));
             cursor.close();
             Log.d(TAG, mProfileUri.toString());
@@ -159,7 +158,7 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
     }
 
     public String getUrlFromServer(String sUrl) {
-        BufferedReader buffr = null;
+        BufferedReader buffr;
         String uploadUrl = null;
         try {
             URL url = new URL(sUrl);
@@ -167,7 +166,7 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
             con.setRequestMethod("GET");
             con.setDoInput(true);
             int responseCode = con.getResponseCode();
-            Log.d(TAG, "응답코드" + responseCode);
+
             if (responseCode == 200) { // 정상 호출
                 buffr = new BufferedReader(new InputStreamReader(con.getInputStream()));
             } else {  // 에러 발생
@@ -182,7 +181,6 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
 
             try {
                 JSONObject json = new JSONObject(response.toString());
-                Log.d(TAG, response.toString());
                 uploadUrl = json.getString("url");
 
             } catch (JSONException e) {

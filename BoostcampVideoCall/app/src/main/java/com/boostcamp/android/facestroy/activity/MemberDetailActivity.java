@@ -1,5 +1,6 @@
-package com.boostcamp.android.facestroy;
+package com.boostcamp.android.facestroy.activity;
 
+import com.boostcamp.android.facestroy.R;
 import com.boostcamp.android.facestroy.db.Member;
 
 import android.os.Bundle;
@@ -37,8 +38,8 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
+        setTheme(R.style.myNoActionBar);
         setContentView(R.layout.activity_member_detail);
         mRealm = Realm.getDefaultInstance();
 
@@ -121,7 +122,7 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
             mPhoneNumber.setText(member.getPhoneNumber());
             mStatus.setText(member.getStatus());
             mCount.setText(member.getCount() + "회");
-            mTime.setText(Utill.timeToString(member.getTime()));
+            mTime.setText(Utill.timeToString(getApplicationContext(),member.getTime()));
             container.addView(view);
             return view;
         }

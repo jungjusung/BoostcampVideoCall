@@ -1,10 +1,11 @@
-package com.boostcamp.android.facestroy;
+package com.boostcamp.android.facestroy.activity;
 
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.boostcamp.android.facestroy.R;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -21,8 +22,8 @@ public class PermissionCheckActivity extends AppCompatActivity {
     // 해당 액티비티에서 권한 설정
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
+        setTheme(R.style.myNoActionBar);
         setContentView(R.layout.activity_permission);
 
         if (android.os.Build.VERSION.SDK_INT >= 23) {
@@ -42,13 +43,12 @@ public class PermissionCheckActivity extends AppCompatActivity {
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                //Toast.makeText(PermissionCheckActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
                 finish();
             }
         };
         new TedPermission(this)
                 .setPermissionListener(permissionlistener)
-                .setDeniedMessage("해당 앱을 사용하려면 권한이 필요합니다.\n\n설정 버튼을 눌러, 권한을 확인해주세요.")
+                .setDeniedMessage(getResources().getString(R.string.permission))
                 .setPermissions(
                         Manifest.permission.CAMERA,
                         Manifest.permission.RECORD_AUDIO,

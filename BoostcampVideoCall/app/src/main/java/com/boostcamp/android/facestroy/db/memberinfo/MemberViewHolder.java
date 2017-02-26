@@ -1,8 +1,8 @@
 package com.boostcamp.android.facestroy.db.memberinfo;
 
-import com.boostcamp.android.facestroy.MemberDetailActivity;
+import com.boostcamp.android.facestroy.activity.MemberDetailActivity;
 import com.boostcamp.android.facestroy.R;
-import com.boostcamp.android.facestroy.VideoCallActvity;
+import com.boostcamp.android.facestroy.activity.VideoCallActvity;
 import com.boostcamp.android.facestroy.db.Member;
 import com.boostcamp.android.facestroy.db.MyInfo;
 import com.bumptech.glide.Glide;

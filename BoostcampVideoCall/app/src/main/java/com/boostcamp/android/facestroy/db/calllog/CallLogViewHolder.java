@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -24,49 +25,44 @@ import io.realm.Realm;
  * Created by Jusung on 2017. 2. 20..
  */
 
-public class CallLogViewHolder extends RecyclerView.ViewHolder{
+public class CallLogViewHolder extends RecyclerView.ViewHolder {
 
-    private static final String TAG="CallLogViewHolder";
-
-    private TextView mFromName,mToName,mDate;
-    private Context mContext;
-    private CircleImageView mFromImage,mToImage;
-    private CallLogAdapter.ListItemClickListener mOnClickListener;
+    private static final String TAG = "CallLogViewHolder";
+    private static final String[] DAY_OF_WEEK = {"", "일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"};
+    private TextView mFromName, mToName, mDate;
+    private CircleImageView mFromImage, mToImage;
     private Realm mRealm;
+    private Context mContext;
     private List<CallLog> mList;
-    public CallLogViewHolder(View itemView,Context mContext, CallLogAdapter.ListItemClickListener mOnClickListener) {
+
+    public CallLogViewHolder(View itemView, Context mContext) {
         super(itemView);
-        this.mContext=mContext;
-        this.mOnClickListener=mOnClickListener;
+        this.mContext = mContext;
 
-        mToName=(TextView)itemView.findViewById(R.id.tv_to_name);
+        mToName = (TextView) itemView.findViewById(R.id.tv_to_name);
+        mFromName = (TextView) itemView.findViewById(R.id.tv_from_name);
+        mToImage = (CircleImageView) itemView.findViewById(R.id.cv_image_to);
+        mFromImage = (CircleImageView) itemView.findViewById(R.id.cv_image_from);
+        mDate = (TextView) itemView.findViewById(R.id.tv_time);
+
         mToName.bringToFront();
-        mFromName=(TextView)itemView.findViewById(R.id.tv_from_name);
-        mToImage=(CircleImageView)itemView.findViewById(R.id.cv_image_to);
-        mFromImage=(CircleImageView)itemView.findViewById(R.id.cv_image_from);
-        mDate=(TextView)itemView.findViewById(R.id.tv_time);
-
-        mRealm=Realm.getDefaultInstance();
+        mRealm = Realm.getDefaultInstance();
         mList = mRealm.where(CallLog.class).findAll();
-
     }
-    public void bind(int listIndex){
-        Member memberFrom=mRealm.where(Member.class).equalTo("token",mList.get(listIndex).getFrom()).findFirst();
-//        Log.d(TAG,"from_name"+memberFrom.getName());
-//        Log.d(TAG,"from_url"+memberFrom.getUrl());
-        Member memberTo=mRealm.where(Member.class).equalTo("token",mList.get(listIndex).getTo()).findFirst();
-//        Log.d(TAG,"to_name"+memberTo.getName());
-//        Log.d(TAG,"to_url"+memberTo.getUrl());
-        if(memberTo!=null) {
+
+    public void bind(int listIndex) {
+        Member memberFrom = mRealm.where(Member.class).equalTo("token", mList.get(listIndex).getFrom()).findFirst();
+        Member memberTo = mRealm.where(Member.class).equalTo("token", mList.get(listIndex).getTo()).findFirst();
+        if (memberTo != null) {
             mToName.setText(memberTo.getName());
             Glide.with(mContext)
                     .load(memberTo.getUrl())
                     .error(R.drawable.sample)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(mToImage);
-        }else{
-            MyInfo myInfo=mRealm.where(MyInfo.class).equalTo("token",mList.get(listIndex).getTo()).findFirst();
-            if(myInfo!=null) {
+        } else {
+            MyInfo myInfo = mRealm.where(MyInfo.class).equalTo("token", mList.get(listIndex).getTo()).findFirst();
+            if (myInfo != null) {
                 mToName.setText(myInfo.getName());
                 Glide.with(mContext)
                         .load(myInfo.getUrl())
@@ -75,16 +71,16 @@ public class CallLogViewHolder extends RecyclerView.ViewHolder{
                         .into(mToImage);
             }
         }
-        if(memberFrom!=null){
+        if (memberFrom != null) {
             mFromName.setText(memberFrom.getName());
             Glide.with(mContext)
                     .load(memberFrom.getUrl())
                     .error(R.drawable.sample)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(mFromImage);
-        }else{
-            MyInfo myInfo=mRealm.where(MyInfo.class).equalTo("token",mList.get(listIndex).getFrom()).findFirst();
-            if(myInfo!=null) {
+        } else {
+            MyInfo myInfo = mRealm.where(MyInfo.class).equalTo("token", mList.get(listIndex).getFrom()).findFirst();
+            if (myInfo != null) {
                 mFromName.setText(myInfo.getName());
                 Glide.with(mContext)
                         .load(myInfo.getUrl())
@@ -93,44 +89,53 @@ public class CallLogViewHolder extends RecyclerView.ViewHolder{
                         .into(mFromImage);
             }
         }
-        String day=computeDate(mList.get(listIndex).getDate());
-        Log.d(TAG,"시간"+day);
+        String day = getStringDate(mList.get(listIndex).getDate());
         mDate.setText(day);
     }
-    public String computeDate(Date before){
-        //수정 필요
-        Date date=new Date(System.currentTimeMillis());
-        long diff = date.getTime() - before.getTime();
-        long diffDays = diff / (24 * 60 * 60 * 1000);
 
-        if(diffDays==0){
+    public String getStringDate(Date date) {
+        //수정 필요
+        Calendar today = Calendar.getInstance();
+        Calendar before = Calendar.getInstance();
+        before.setTime(date);
+
+        long diffDays = (today.getTimeInMillis() - before.getTimeInMillis()) / (24 * 60 * 60 * 1000);
+
+        if (diffDays == 0) {
             String flag;
-            if(before.getHours()>12)
-                flag="오후 ";
+            String timeFlag = mContext.getResources().getString(R.string.time_flag);
+            if (before.get(Calendar.HOUR) > 12)
+                flag = mContext.getResources().getString(R.string.pm);
             else
-                flag="오전 ";
-            return flag+before.getHours()+" : "+before.getMinutes();
-        }else if(diffDays==1){
-            return "어제";
-        }else {
-            switch (before.getDay()){
-                case 1:
-                    return "일요일";
-                case 2:
-                    return "월요일";
-                case 3:
-                    return "화요일";
-                case 4:
-                    return "수요일";
-                case 5:
-                    return "목요일";
-                case 6:
-                    return "금요일";
-                case 7:
-                    return "토요일";
-            }
+                flag = mContext.getResources().getString(R.string.am);
+            return flag + before.get(Calendar.HOUR) + timeFlag + before.get(Calendar.HOUR);
         }
 
-        return "";
+        // 하루전
+        if (diffDays == 1)
+            return mContext.getResources().getString(R.string.yesterday);
+
+        // 일주일 사이
+        if(diffDays<=7) {
+            switch (before.get(Calendar.DAY_OF_WEEK)) {
+                case Calendar.SUNDAY:
+                    return DAY_OF_WEEK[Calendar.SUNDAY];
+                case Calendar.MONDAY:
+                    return DAY_OF_WEEK[Calendar.MONDAY];
+                case Calendar.TUESDAY:
+                    return DAY_OF_WEEK[Calendar.TUESDAY];
+                case Calendar.WEDNESDAY:
+                    return DAY_OF_WEEK[Calendar.WEDNESDAY];
+                case Calendar.THURSDAY:
+                    return DAY_OF_WEEK[Calendar.THURSDAY];
+                case Calendar.FRIDAY:
+                    return DAY_OF_WEEK[Calendar.FRIDAY];
+                case Calendar.SATURDAY:
+                    return DAY_OF_WEEK[Calendar.SATURDAY];
+            }
+        }
+        // 그후
+        String dot=mContext.getResources().getString(R.string.dot);
+        return before.get(Calendar.YEAR)+dot+(before.get(Calendar.MONTH)+1)+dot+before.get(Calendar.DATE);
     }
 }

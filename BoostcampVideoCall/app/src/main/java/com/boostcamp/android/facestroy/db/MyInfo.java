@@ -9,10 +9,10 @@ import io.realm.annotations.PrimaryKey;
 
 public class MyInfo extends RealmObject {
 
-    private String name;
-    private String phoneNumber;
     @PrimaryKey
     private String token;
+    private String name;
+    private String phoneNumber;
     private String url;
     private String status;
 

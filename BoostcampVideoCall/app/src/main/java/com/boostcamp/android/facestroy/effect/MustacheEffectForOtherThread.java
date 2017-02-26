@@ -6,13 +6,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.SparseArray;
-import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import com.boostcamp.android.facestroy.R;
-import com.boostcamp.android.facestroy.SafeFaceDetector;
+import com.boostcamp.android.facestroy.utill.SafeFaceDetector;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
@@ -29,53 +27,51 @@ import java.util.Queue;
 
 public class MustacheEffectForOtherThread extends Thread {
 
-    private PlayRTCVideoView localView;
     private static final String TAG = "MustacheEffectForOtherThread";
-    private PlayRTCVideoView remoteView;
+    private PlayRTCVideoView mLocalView;
+    private PlayRTCVideoView mRemoteView;
     private Bitmap mBitmap;
-    private Context context;
-    private boolean flag = true;
-    FaceDetector faceDetector;
-    Detector<Face> safeDetector;
-    Queue<Bitmap> bitmapQueue = new LinkedList<>();
-    Queue<Face> faceQueue = new LinkedList<>();
+    private Context mContext;
+    private boolean mThreadFlag = true;
+    private FaceDetector mFaceDetector;
+    private Detector<Face> mSafeDetector;
+    private Queue<Bitmap> mBitmapQueue = new LinkedList<>();
+
 
     private RelativeLayout mLayout;
-    RelativeLayout.LayoutParams param;
-    private Effect effect;
+    private RelativeLayout.LayoutParams mParam;
+    private Effect mEffect;
 
     public MustacheEffectForOtherThread(PlayRTCVideoView localView, PlayRTCVideoView remoteView, Context context, RelativeLayout relativeLayout) {
-        this.localView = localView;
-        this.remoteView = remoteView;
-        this.context = context;
+        this.mLocalView = localView;
+        this.mRemoteView = remoteView;
+        this.mContext = context;
         mLayout = relativeLayout;
-        WindowManager wm = (WindowManager)    context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
 
-        faceDetector = new
+        mFaceDetector = new
                 FaceDetector.Builder(context)
                 .setLandmarkType(FaceDetector.ALL_LANDMARKS)
                 .setTrackingEnabled(true)
                 .build();
-        safeDetector = new SafeFaceDetector(faceDetector);
+        mSafeDetector = new SafeFaceDetector(mFaceDetector);
 
-        effect = new Effect(context,0,0, 150, 100);
-        effect.setBackgroundResource(R.drawable.effect1);
-        effect.setVisibility(View.INVISIBLE);
-        param = new RelativeLayout.LayoutParams(250, 120);
+        mEffect = new Effect(context,0,0, 150, 100);
+        mEffect.setBackgroundResource(R.drawable.effect1);
+        mEffect.setVisibility(View.INVISIBLE);
+        mParam = new RelativeLayout.LayoutParams(250, 120);
 
 
-        effect.setLayoutParams(param);
-        mLayout.addView(effect);
+        mEffect.setLayoutParams(mParam);
+        mLayout.addView(mEffect);
 
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void run() {
-        while (flag) {
+        while (mThreadFlag) {
             try {
-                if (remoteView != null) {
+                if (mRemoteView != null) {
                     makeSanpshot();
                     detectSnapShot();
                     sleep(30);
@@ -88,37 +84,36 @@ public class MustacheEffectForOtherThread extends Thread {
         }
     }
 
-    public synchronized void makeSanpshot() {
-        remoteView.snapshot(new PlayRTCVideoView.SnapshotObserver() {
+    private synchronized void makeSanpshot() {
+        mRemoteView.snapshot(new PlayRTCVideoView.SnapshotObserver() {
 
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onSnapshotImage(Bitmap image) {
                 if (image != null) {
-                    bitmapQueue.add(image);
+                    mBitmapQueue.add(image);
                 }
             }
         });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public synchronized void detectSnapShot() {
+    private synchronized void detectSnapShot() {
 
-        if (bitmapQueue.size() == 0)
+        if (mBitmapQueue.size() == 0)
             return;
 
-        Bitmap myBitmap = bitmapQueue.poll();
+        Bitmap myBitmap = mBitmapQueue.poll();
         if (myBitmap == null)
             return;
 
-
         myBitmap = Bitmap.createScaledBitmap(myBitmap, myBitmap.getWidth() / 10, myBitmap.getHeight() / 10, true);
         Frame frame = new Frame.Builder().setBitmap(myBitmap).build();
-        SparseArray<Face> faces = safeDetector.detect(frame);
+        SparseArray<Face> faces = mSafeDetector.detect(frame);
         myBitmap.recycle();
 
         if (faces.size() == 0) {
-            if (effect.getVisibility() == View.VISIBLE)
+            if (mEffect.getVisibility() == View.VISIBLE)
                 new myAsyncInVisible().execute();
             else
                 return;
@@ -141,7 +136,7 @@ public class MustacheEffectForOtherThread extends Thread {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            effect.setVisibility(View.GONE);
+            mEffect.setVisibility(View.GONE);
         }
     }
 
@@ -157,12 +152,12 @@ public class MustacheEffectForOtherThread extends Thread {
 
             super.onPostExecute(face);
             if (face != null) {
-                effect.setVisibility(View.VISIBLE);
+                mEffect.setVisibility(View.VISIBLE);
                 for (Landmark landmark : face.getLandmarks()) {
                     if (landmark.getType() == Landmark.NOSE_BASE) {
-                        effect.setX((int) (landmark.getPosition().x * 10-30));
-                        effect.setY((int) (landmark.getPosition().y * 10));
-                        mLayout.updateViewLayout(effect, param);
+                        mEffect.setX((int) (landmark.getPosition().x * 10-30));
+                        mEffect.setY((int) (landmark.getPosition().y * 10));
+                        mLayout.updateViewLayout(mEffect, mParam);
                         break;
                         //    Log.d(TAG, "인식 x: " + (int) (face.getLandmarks().get(2).getPosition().x * 5) + " y: " + (int) (face.getLandmarks().get(2).getPosition().y * 5));
                     }
@@ -171,23 +166,23 @@ public class MustacheEffectForOtherThread extends Thread {
         }
     }
     public void stopThread(){
-        flag=false;
+        mThreadFlag =false;
         interrupt();
     }
     public void effectOff(){
-        effect.setVisibility(View.INVISIBLE);
+        mEffect.setVisibility(View.INVISIBLE);
     }
 
 
     public boolean isRunning(){
-        return flag;
+        return mThreadFlag;
     }
 
     public void effectOn(){
-        effect.setVisibility(View.VISIBLE);
+        mEffect.setVisibility(View.VISIBLE);
     }
     public void restartThread(){
-        flag=true;
+        mThreadFlag =true;
         interrupt();
     }
 }

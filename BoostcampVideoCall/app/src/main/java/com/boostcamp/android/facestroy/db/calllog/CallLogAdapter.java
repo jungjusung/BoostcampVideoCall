@@ -44,7 +44,7 @@ public class CallLogAdapter extends RealmRecyclerViewAdapter<CallLog, CallLogVie
     @Override
     public CallLogViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         final View view = LayoutInflater.from(mContext).inflate(com.boostcamp.android.facestroy.R.layout.item_rv_log_content, viewGroup, false);
-        CallLogViewHolder holder = new CallLogViewHolder(view, mContext, mOnClickListener);
+        CallLogViewHolder holder = new CallLogViewHolder(view, mContext);
 
         return holder;
     }
@@ -52,7 +52,6 @@ public class CallLogAdapter extends RealmRecyclerViewAdapter<CallLog, CallLogVie
     @Override
     public void onBindViewHolder(CallLogViewHolder holder, int position) {
         holder.bind(position);
-        Log.d(TAG, "#" + position);
     }
 
     @Override

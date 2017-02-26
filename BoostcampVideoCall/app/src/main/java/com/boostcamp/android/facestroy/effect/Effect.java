@@ -10,25 +10,23 @@ import android.widget.ImageView;
  */
 
 public class Effect extends ImageView {
-    private int winX;
-    private int winY;
-    private int x;
-    private int y;
-    private int width;
-    private int heigth;
 
-    ViewGroup.LayoutParams params;
+    private int mX;
+    private int mY;
+    private int mWidth;
+    private int mHeight;
+    private ViewGroup.LayoutParams mParams;
 
     public Effect(Context context, int winX, int winY, int width, int height) {
         super(context);
-        this.x = winX - width / 2;
-        this.y = winY - height / 2;
-        this.width = width;
-        this.heigth = height;
+        this.mX = winX - width / 2;
+        this.mY = winY - height / 2;
+        this.mWidth = width;
+        this.mHeight = height;
         this.setVisibility(View.GONE);
-        params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        setLayoutParams(params);
+        setLayoutParams(mParams);
     }
 
 }

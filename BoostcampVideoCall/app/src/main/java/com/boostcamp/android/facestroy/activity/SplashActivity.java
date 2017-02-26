@@ -1,7 +1,8 @@
-package com.boostcamp.android.facestroy;
+package com.boostcamp.android.facestroy.activity;
 
 import android.animation.ObjectAnimator;
-import com.boostcamp.android.facestroy.db.CallLog;
+
+import com.boostcamp.android.facestroy.R;
 import com.boostcamp.android.facestroy.db.MyInfo;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -9,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 
 import com.boostcamp.android.facestroy.utill.Utill;
@@ -26,21 +26,21 @@ public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG="SplashActivity";
     private Realm mRealm;
-    private ShimmerFrameLayout logoText;
+    private ShimmerFrameLayout mLogoText;
 
-    private int infoSize;
+    private int mInfoSize;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        logoText = (ShimmerFrameLayout) findViewById(R.id.shimmer_text);
-        logoText.setDuration(2000);
-        logoText.setRepeatMode(ObjectAnimator.REVERSE);
+        mLogoText = (ShimmerFrameLayout) findViewById(R.id.shimmer_text);
+        mLogoText.setDuration(2000);
+        mLogoText.setRepeatMode(ObjectAnimator.REVERSE);
 
         mRealm = Realm.getDefaultInstance();
-        infoSize = getInfoSize();
+        mInfoSize = getInfoSize();
         openSignUpActivity();
     }
     public int getInfoSize() {
@@ -52,7 +52,7 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (infoSize == 0) {
+                if (mInfoSize == 0) {
                     Intent intent = new Intent(getApplicationContext(), SingUpActivity.class);
                     startActivity(intent);
                     finish();
@@ -73,12 +73,12 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        logoText.startShimmerAnimation();
+        mLogoText.startShimmerAnimation();
     }
     @Override
     public void onPause() {
         super.onPause();
-        logoText.stopShimmerAnimation();
+        mLogoText.stopShimmerAnimation();
     }
     @Override
     protected void onDestroy() {

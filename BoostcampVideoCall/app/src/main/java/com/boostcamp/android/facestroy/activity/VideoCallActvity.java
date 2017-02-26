@@ -1,7 +1,8 @@
-package com.boostcamp.android.facestroy;
+package com.boostcamp.android.facestroy.activity;
 
 import android.animation.ObjectAnimator;
 
+import com.boostcamp.android.facestroy.R;
 import com.boostcamp.android.facestroy.db.CallLog;
 import com.boostcamp.android.facestroy.db.Member;
 import com.boostcamp.android.facestroy.db.MyInfo;
@@ -27,9 +28,9 @@ import com.boostcamp.android.facestroy.effect.MustacheEffectForMeThread;
 import com.boostcamp.android.facestroy.effect.MustacheEffectForOtherThread;
 import com.boostcamp.android.facestroy.effect.RabbitEffectForMeThread;
 import com.boostcamp.android.facestroy.effect.RabbitEffectForOtherThread;
+import com.boostcamp.android.facestroy.utill.Constant;
 import com.boostcamp.android.facestroy.utill.Utill;
 import com.facebook.shimmer.ShimmerFrameLayout;
-import com.google.android.gms.vision.face.Face;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.sktelecom.playrtc.PlayRTC;
 import com.sktelecom.playrtc.PlayRTCFactory;
@@ -65,49 +66,37 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
 
 
     private static final String TAG = "VideoCallActvity";
-    private static final String KEY = "60ba608a-e228-4530-8711-fa38004719c1";
-    private static final int EFFECT_TREEHEART = 0;
-    private static final int EFFECT_MUSTACHE = 1;
-    private static final int EFFECT_RABBIT = 2;
 
-
-    private PlayRTCObserver playrtcObserver = null;
-    private PlayRTC playrtc = null;
+    private PlayRTCObserver mPlayrtcObserver;
+    private PlayRTC mPlayrtc;
 
     //뷰 관련 멤버 변수
-    private PlayRTCVideoView localView;
-    private PlayRTCVideoView remoteView;
+    private PlayRTCVideoView mLocalView,mRemoteView;
+    private String mToken,mName,mPhoneNumber,mChannelId;
 
-    private String mToken;
-    private String mName;
-    private String mPhoneNumber;
-    private String mChannelId;
     private Realm mRealm;
     private ShimmerFrameLayout mEndCall;
 
     private Context mContext;
     private MediaPlayer mPlayer;
-    private long mStartTime;
-    private long mEndTime;
+    private long mStartTime,mEndTime;
     private Date mDate;
 
-    private RelativeLayout mMenuButton;
-    private RelativeLayout mEffectButton;
-    private LinearLayout mBtnExit, mBtnEffect, mBtnRotation;
-    private LinearLayout mEffectHeart, mEffectRabbit, mEffectMustache, mEffectExit;
+    private RelativeLayout mMenuButton,mEffectButton, mMyVideoViewGroup;
+    private LinearLayout mEffectHeart, mEffectRabbit, mEffectMustache, mEffectExit,mBtnExit, mBtnEffect, mBtnRotation;
     private List<LinearLayout> mEffectList = new LinkedList<>();
     private int mLocation[] = new int[2];
-    private RelativeLayout myVideoViewGroup;
+
 
     private boolean mEffectFlag = false;
 
-    private HeartTreeEffectForMeThread heartTreeEffectForMeThread;
-    private MustacheEffectForMeThread mustacheEffectForMeThread;
-    private RabbitEffectForMeThread rabbitEffectForMeThread;
+    private HeartTreeEffectForMeThread mHeartTreeEffectForMeThread;
+    private MustacheEffectForMeThread mMustacheEffectForMeThread;
+    private RabbitEffectForMeThread mRabbitEffectForMeThread;
 
-    public static HeartTreeEffectForOtherThread heartTreeEffectForOtherThread;
-    public static MustacheEffectForOtherThread mustacheEffectForOtherThread;
-    public static RabbitEffectForOtherThread rabbitEffectForOtherThread;
+    public static HeartTreeEffectForOtherThread mHeartTreeEffectForOtherThread;
+    public static MustacheEffectForOtherThread mMustacheEffectForOtherThread;
+    public static RabbitEffectForOtherThread mRabbitEffectForOtherThread;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -157,11 +146,10 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         mPhoneNumber = intent.getStringExtra("phoneNumber");
         mRealm = Realm.getDefaultInstance();
 
-        Log.d(TAG, " 전송 로그 : " + mToken);
         MyInfo myInfo = mRealm.where(MyInfo.class).findFirst();
-        Log.d(TAG, "비디오뷰생성");
+
         createPlayRTCInstance();
-        createChannel(myInfo.getToken());
+        createChannel();
         Utill.startRingtone(mContext, mPlayer);
     }
 
@@ -173,9 +161,9 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             createPlayRTCObserverInstance();
             //옵저버 생성
 
-            playrtc = PlayRTCFactory.createPlayRTC(setting, playrtcObserver);
-            Log.d(TAG, playrtc.toString());
-            Log.d(TAG, "playrtc생성");
+            mPlayrtc = PlayRTCFactory.createPlayRTC(setting, mPlayrtcObserver);
+            Log.d(TAG, mPlayrtc.toString());
+
             //플레이 rtc객체 생성
 
         } catch (UnsupportedPlatformVersionException e) {
@@ -188,13 +176,10 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     private PlayRTCConfig setPlayRTCConfiguration() {
         PlayRTCConfig settings = PlayRTCFactory.createConfig();
 
-        // PlayRTC instance have to get the application context.
         settings.setAndroidContext(getApplicationContext());
 
-
         settings.setPrevUserMediaEnable(true);
-        // T Developers Project Key.
-        settings.setProjectId(KEY);
+        settings.setProjectId(Constant.KEY);
 
         // video는 기본 640x480 30 frame
         settings.video.setEnable(true);
@@ -208,7 +193,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
 
     //
     private void createPlayRTCObserverInstance() {
-        playrtcObserver = new PlayRTCObserver() {
+        mPlayrtcObserver = new PlayRTCObserver() {
             @Override
             public void onConnectChannel(PlayRTC playRTC, String channelId, String reason) {
                 super.onConnectChannel(playRTC, channelId, reason);
@@ -222,42 +207,39 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             public void onAddLocalStream(PlayRTC playRTC, PlayRTCMedia playRTCMedia) {
 
                 long delayTime = 0;
-                localView.show(delayTime);
-                // Link the media stream to the view.
-                playRTCMedia.setVideoRenderer(localView.getVideoRenderer());
+                mLocalView.show(delayTime);
+                playRTCMedia.setVideoRenderer(mLocalView.getVideoRenderer());
 
-                myVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
-                if (localView != null) {
+                mMyVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
+                if (mLocalView != null) {
 
                     //애니메이션 효과 있을시
-                    mustacheEffectForOtherThread = new MustacheEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
-                    heartTreeEffectForOtherThread = new HeartTreeEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
-                    rabbitEffectForOtherThread = new RabbitEffectForOtherThread(localView, remoteView, mContext, myVideoViewGroup);
+                    mMustacheEffectForOtherThread = new MustacheEffectForOtherThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
+                    mHeartTreeEffectForOtherThread = new HeartTreeEffectForOtherThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
+                    mRabbitEffectForOtherThread = new RabbitEffectForOtherThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
 
-                    heartTreeEffectForMeThread = new HeartTreeEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
-                    mustacheEffectForMeThread = new MustacheEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
-                    rabbitEffectForMeThread = new RabbitEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
+                    mHeartTreeEffectForMeThread = new HeartTreeEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
+                    mMustacheEffectForMeThread = new MustacheEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
+                    mRabbitEffectForMeThread = new RabbitEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
                 }
-                localView.getHolder().addCallback(new SurfaceCallback());
+                mLocalView.getHolder().addCallback(new SurfaceCallback());
             }
 
             @Override
             public void onAddRemoteStream(PlayRTC playRTC, String s, String s1, PlayRTCMedia playRTCMedia) {
                 changeLocalVidoeView();
                 long delayTime = 100;
-                remoteView.show(delayTime);
+                mRemoteView.show(delayTime);
                 mEndCall.setVisibility(View.INVISIBLE);
-                // Link the media stream to the view.
-                playRTCMedia.setVideoRenderer(remoteView.getVideoRenderer());
+
+                playRTCMedia.setVideoRenderer(mRemoteView.getVideoRenderer());
                 Utill.stopRington(mPlayer);
-//                MustacheEffectForMeThread th=new MustacheEffectForMeThread(localView,remoteView,);
-//                th.start();
             }
 
             @Override
             public void onDisconnectChannel(PlayRTC playRTC, String s) {
                 finish();
-                if (playrtc != null) {
+                if (mPlayrtc != null) {
 
                 }
             }
@@ -265,8 +247,8 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onOtherDisconnectChannel(PlayRTC playRTC, String s, String s1) {
                 finish();
-                if (playrtc != null) {
-                    playrtc.close();
+                if (mPlayrtc != null) {
+                    mPlayrtc.close();
                 }
             }
         };
@@ -275,39 +257,39 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     private void createVideoView() {
         RelativeLayout myVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
 
-        if (localView != null) {
+        if (mLocalView != null) {
             return;
         }
         Point myViewDimensions = new Point();
         myViewDimensions.x = myVideoViewGroup.getWidth();
         myViewDimensions.y = myVideoViewGroup.getHeight();
 
-        if (remoteView == null) {
+        if (mRemoteView == null) {
             createRemoteVideoView(myViewDimensions, myVideoViewGroup);
         }
-        if (localView == null) {
+        if (mLocalView == null) {
             createLocalVideoView(myViewDimensions, myVideoViewGroup);
         }
     }
 
     private void createLocalVideoView(Point parentViewDimensions, RelativeLayout parentVideoViewGroup) {
-        if (localView == null) {
+        if (mLocalView == null) {
             Point myVideoSize = new Point();
             myVideoSize.x = parentViewDimensions.x;
             myVideoSize.y = parentViewDimensions.y;
 
 
             RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-            localView = new PlayRTCVideoView(parentVideoViewGroup.getContext());
-            localView.setMirror(false);
+            mLocalView = new PlayRTCVideoView(parentVideoViewGroup.getContext());
+            mLocalView.setMirror(false);
 
 
-            localView.setLayoutParams(param);
-            parentVideoViewGroup.addView(localView);
+            mLocalView.setLayoutParams(param);
+            parentVideoViewGroup.addView(mLocalView);
             parentVideoViewGroup.setOnTouchListener(this);
-            localView.setZOrderMediaOverlay(true);
-            localView.initRenderer();
-            localView.setOnTouchListener(this);
+            mLocalView.setZOrderMediaOverlay(true);
+            mLocalView.initRenderer();
+            mLocalView.setOnTouchListener(this);
         }
     }
 
@@ -316,7 +298,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         Point myViewDimensions = new Point();
         myViewDimensions.x = (int) (myVideoViewGroup.getWidth() * 0.3);
         myViewDimensions.y = (int) (myVideoViewGroup.getHeight() * 0.3);
-        if (localView == null) {
+        if (mLocalView == null) {
             Log.d(TAG, "로컬뷰가 생성되지 않음");
             return;
         }
@@ -324,38 +306,37 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         param.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         param.setMargins(30, 30, 30, 30);
-        localView.setLayoutParams(param);
+        mLocalView.setLayoutParams(param);
 
-        localView.getLocationOnScreen(mLocation);
+        mLocalView.getLocationOnScreen(mLocation);
         Log.d(TAG, mLocation[0] + " " + mLocation[1]);
     }
 
     private void createRemoteVideoView(final Point parentViewDimensions, RelativeLayout parentVideoViewGroup) {
 
-        if (remoteView == null) {
+        if (mRemoteView == null) {
             Point myVideoSize = new Point();
             myVideoSize.x = parentViewDimensions.x;
             myVideoSize.y = parentViewDimensions.y;
 
             RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-            // Create the remoteView.
-            remoteView = new PlayRTCVideoView(parentVideoViewGroup.getContext());
-            remoteView.setMirror(false);
-            // Set the layout parameters.
-            remoteView.setLayoutParams(param);
 
-            // Add the view to the videoViewGroup.
-            parentVideoViewGroup.addView(remoteView);
-            remoteView.initRenderer();
-            remoteView.setOnTouchListener(this);
+            mRemoteView = new PlayRTCVideoView(parentVideoViewGroup.getContext());
+            mRemoteView.setMirror(false);
+
+            mRemoteView.setLayoutParams(param);
+
+            parentVideoViewGroup.addView(mRemoteView);
+            mRemoteView.initRenderer();
+            mRemoteView.setOnTouchListener(this);
         }
 
 
     }
 
-    private void createChannel(String name) {
+    private void createChannel() {
         try {
-            // createChannel must have a JSON Object
+
             JSONObject parameters = new JSONObject();
             // 채널정보를 정의한다.
             JSONObject channel = new JSONObject();
@@ -367,8 +348,6 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 e.printStackTrace();
             }
 
-
-            // 채널 사용자에 대한 정보를 정의한다.
             JSONObject peer = new JSONObject();
             try {
                 peer.put("uid", "");
@@ -377,7 +356,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 e.printStackTrace();
             }
             Log.d(TAG, "playRTC.createChannel " + parameters.toString());
-            playrtc.createChannel(parameters);
+            mPlayrtc.createChannel(parameters);
         } catch (RequiredConfigMissingException e) {
             e.printStackTrace();
         }
@@ -480,18 +459,18 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View view) {
         String sender = FirebaseInstanceId.getInstance().getToken();
-        String url = "http://1-dot-boostcamp-jusung.appspot.com/effect";
+        String url = "http://1-dot-boostcamp-jusung.appspot.com/mEffect";
         String point = "sender";
         String effect, check;
         switch (view.getId()) {
 
             case R.id.shimmer_end_call:
 
-                playrtc.deleteChannel();
+                mPlayrtc.deleteChannel();
                 finish();
                 break;
             case R.id.btn_exit:
-                playrtc.deleteChannel();
+                mPlayrtc.deleteChannel();
                 finish();
                 break;
             case R.id.btn_effect:
@@ -504,17 +483,16 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             //쓰레드 종료 재시작 로직!!!
             case R.id.effect_heartTree:
 
-                if (heartTreeEffectForMeThread.getState() == Thread.State.NEW) {
-                    Log.d(TAG, "하트쓰레드 시작");
-                    heartTreeEffectForMeThread.start();
+                if (mHeartTreeEffectForMeThread.getState() == Thread.State.NEW) {
+                    mHeartTreeEffectForMeThread.start();
                     effect="heart";
                     check="start";
                     new SenderAsync().execute(url,mToken,effect,sender,check,point);
 
-                } else if (heartTreeEffectForMeThread.getState() == Thread.State.TERMINATED) {
-                    Log.d(TAG, "하트쓰레드 재생성");
-                    heartTreeEffectForMeThread = new HeartTreeEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
-                    heartTreeEffectForMeThread.start();
+                } else if (mHeartTreeEffectForMeThread.getState() == Thread.State.TERMINATED) {
+
+                    mHeartTreeEffectForMeThread = new HeartTreeEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
+                    mHeartTreeEffectForMeThread.start();
                 }
 
 
@@ -522,27 +500,26 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.effect_mustache:
 
-                if (mustacheEffectForMeThread.getState() == Thread.State.NEW) {
+                if (mMustacheEffectForMeThread.getState() == Thread.State.NEW) {
                     effect = "mustache";
                     check = "start";
-                    Log.d(TAG, "수염 쓰레드 생성");
-                    mustacheEffectForMeThread.start();
+                    mMustacheEffectForMeThread.start();
                     new SenderAsync().execute(url,mToken,effect,sender,check,point);
-                } else if (mustacheEffectForMeThread.getState() == Thread.State.TERMINATED) {
-                    mustacheEffectForMeThread = new MustacheEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
-                    mustacheEffectForMeThread.start();
+                } else if (mMustacheEffectForMeThread.getState() == Thread.State.TERMINATED) {
+                    mMustacheEffectForMeThread = new MustacheEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
+                    mMustacheEffectForMeThread.start();
                 }
                 btnSetEnabled();
                 break;
             case R.id.effect_rabbit:
-                if (rabbitEffectForMeThread.getState() == Thread.State.NEW) {
+                if (mRabbitEffectForMeThread.getState() == Thread.State.NEW) {
                     effect = "rabbit";
                     check = "start";
-                    rabbitEffectForMeThread.start();
+                    mRabbitEffectForMeThread.start();
                     new SenderAsync().execute(url,mToken,effect,sender,check,point);
-                }else if (rabbitEffectForMeThread.getState() == Thread.State.TERMINATED) {
-                    rabbitEffectForMeThread = new RabbitEffectForMeThread(localView, remoteView, mContext, myVideoViewGroup);
-                    rabbitEffectForMeThread.start();
+                }else if (mRabbitEffectForMeThread.getState() == Thread.State.TERMINATED) {
+                    mRabbitEffectForMeThread = new RabbitEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
+                    mRabbitEffectForMeThread.start();
                 }
                 btnSetEnabled();
                 break;
@@ -559,7 +536,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         exitThread();
         Utill.stopRington(mPlayer);
 
-        playrtc.close();
+        mPlayrtc.close();
         mEndTime = System.currentTimeMillis();
         mDate = new Date(mEndTime);
 
@@ -585,8 +562,8 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         callLog.setTime(time);
         mRealm.insert(callLog);
         mRealm.commitTransaction();
-        if (playrtc != null) {
-            playrtc.close();
+        if (mPlayrtc != null) {
+            mPlayrtc.close();
         }
     }
 
@@ -619,30 +596,30 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
 
     public void exitThread() {
         String sender = FirebaseInstanceId.getInstance().getToken();
-        String url = "http://1-dot-boostcamp-jusung.appspot.com/effect";
+        String url = "http://1-dot-boostcamp-jusung.appspot.com/mEffect";
         String point = "sender";
 
         String effect, check;
-        if (heartTreeEffectForMeThread != null) {
+        if (mHeartTreeEffectForMeThread != null) {
             effect="heart";
             check="end";
-            heartTreeEffectForMeThread.effectOff();
-            heartTreeEffectForMeThread.stopThread();
+            mHeartTreeEffectForMeThread.effectOff();
+            mHeartTreeEffectForMeThread.stopThread();
             new SenderAsync().execute(url,mToken,effect,sender,check,point);
         }
-        if (mustacheEffectForMeThread != null) {
+        if (mMustacheEffectForMeThread != null) {
             effect="mustache";
             check="end";
-            mustacheEffectForMeThread.effectOff();
-            mustacheEffectForMeThread.stopThread();
+            mMustacheEffectForMeThread.effectOff();
+            mMustacheEffectForMeThread.stopThread();
             new SenderAsync().execute(url,mToken,effect,sender,check,point);
         }
 
-        if (rabbitEffectForMeThread != null) {
+        if (mRabbitEffectForMeThread != null) {
             effect="rabbit";
             check="end";
-            rabbitEffectForMeThread.effectOff();
-            rabbitEffectForMeThread.stopThread();
+            mRabbitEffectForMeThread.effectOff();
+            mRabbitEffectForMeThread.stopThread();
             new SenderAsync().execute(url,mToken,effect,sender,check,point);
         }
 

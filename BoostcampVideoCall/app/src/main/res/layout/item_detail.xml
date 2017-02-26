@@ -33,14 +33,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="장희령"
             android:textSize="20sp" />
         <TextView
             android:id="@+id/tv_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="상태 메세지"
             android:textSize="12sp"
             />
     </LinearLayout>
@@ -62,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle"
 
-                android:text="전화번호"
+                android:text="@string/number"
                 android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
@@ -72,7 +70,6 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle_gray"
                 android:gravity="center"
-                android:text="010-5145-2554"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -86,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle"
-                android:text="통화횟수"
+                android:text="@string/call_num"
                 android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
@@ -96,7 +93,6 @@
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle_gray"
-                android:text="10회"
                 android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
@@ -108,7 +104,7 @@
 
                 android:gravity="center"
                 android:layout_marginLeft="10dp"
-                android:text="총통화시간"
+                android:text="@string/total_time"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
 
@@ -118,7 +114,6 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle_gray"
                 android:gravity="center"
-                android:text="06:44:10"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
         </LinearLayout>

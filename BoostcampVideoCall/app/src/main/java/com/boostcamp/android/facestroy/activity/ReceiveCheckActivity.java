@@ -1,7 +1,6 @@
-package com.boostcamp.android.facestroy;
+package com.boostcamp.android.facestroy.activity;
 
 import android.animation.ObjectAnimator;
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
@@ -15,7 +14,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.boostcamp.android.facestroy.utill.PushWakeLock;
+import com.boostcamp.android.facestroy.R;
+import com.boostcamp.android.facestroy.utill.Constant;
 import com.boostcamp.android.facestroy.utill.Utill;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
@@ -28,7 +28,6 @@ import java.io.IOException;
 public class ReceiveCheckActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final String TAG="CallReciveActivity";
-    private static final int FACE_FRONT=1;
 
     private SurfaceView mFaceView;
     private ShimmerFrameLayout mShimmerLayout;
@@ -43,10 +42,8 @@ public class ReceiveCheckActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
-
-
+        setTheme(R.style.myNoActionBar);
         setContentView(R.layout.activity_videocall_receive);
 
         mContext=getApplicationContext();
@@ -83,13 +80,11 @@ public class ReceiveCheckActivity extends AppCompatActivity implements View.OnCl
 
         Utill.startRingtone(mContext,mPlayer);
 
-        //createPlayRTCInstance();
-        //connectChannel(mChannelId);
     }
     private SurfaceHolder.Callback faceListener=new SurfaceHolder.Callback(){
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
-            mCamera=Camera.open(FACE_FRONT);
+            mCamera=Camera.open(Constant.FACE_FRONT);
             try {
                 mCamera.setPreviewDisplay(surfaceHolder);
             } catch (IOException e) {

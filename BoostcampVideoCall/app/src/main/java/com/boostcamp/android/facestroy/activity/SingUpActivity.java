@@ -1,5 +1,6 @@
-package com.boostcamp.android.facestroy;
+package com.boostcamp.android.facestroy.activity;
 
+import com.boostcamp.android.facestroy.R;
 import com.boostcamp.android.facestroy.db.MyInfo;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +13,6 @@ import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,15 +32,15 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
     private static final String TAG="SingUpActivity";
     private EditText mEditName, mEditPhone;
     private Button mRegistBtn;
-    private Realm realm;
-    private String token;
+    private Realm mRealm;
+    private String mToken;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setTheme(R.style.myNoActionBar);
         super.onCreate(savedInstanceState);
+        setTheme(R.style.myNoActionBar);
         setContentView(R.layout.activity_sign_up);
-        token = FirebaseInstanceId.getInstance().getToken();
+        mToken = FirebaseInstanceId.getInstance().getToken();
 
 
         mEditName = (EditText) findViewById(R.id.et_name);
@@ -86,23 +86,23 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
             String name = mEditName.getText().toString();
             String phoneNumber = mEditPhone.getText().toString();
             if(name.equals("")){
-                Toast.makeText(this, "사용자의 이름을 입력 하세요.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.name_check), Toast.LENGTH_SHORT).show();
                 return;
             }
             if(phoneNumber.equals("")){
-                Toast.makeText(this, "연락처를 입력해주세요.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.phone_number), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             phoneNumber = editPhoneNumberValid(phoneNumber);
-            insertToRealmInfo(name,phoneNumber,token);
-            insertDB(name,phoneNumber,token);
+            insertToRealmInfo(name,phoneNumber, mToken);
+            insertDB(name,phoneNumber, mToken);
         }
     }
     public void insertToRealmInfo(String name,String phoneNumber,String token){
-        realm=Realm.getDefaultInstance();
+        mRealm =Realm.getDefaultInstance();
         MyInfo info=new MyInfo();
-        realm.beginTransaction();
+        mRealm.beginTransaction();
         info.setName(name);
         info.setPhoneNumber(phoneNumber);
         if(token==null||token.equals(""))
@@ -111,8 +111,8 @@ public class SingUpActivity extends AppCompatActivity implements View.OnClickLis
             info.setToken(token);
         info.setUrl("");
         info.setStatus("");
-        realm.insert(info);
-        realm.commitTransaction();
+        mRealm.insert(info);
+        mRealm.commitTransaction();
     }
     public void insertDB(String name,String phoneNumber,String token){
         new InsertDBAsyncTask().execute(name,phoneNumber,token);

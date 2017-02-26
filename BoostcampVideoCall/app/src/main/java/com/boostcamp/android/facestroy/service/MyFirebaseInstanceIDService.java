@@ -1,4 +1,4 @@
-package com.boostcamp.android.facestroy;
+package com.boostcamp.android.facestroy.service;
 
 import android.util.Log;
 
