@@ -31,7 +31,6 @@ import java.util.Queue;
 
 public class MustacheEffectForMeThread extends Thread {
 
-    private static final int MARGIN = 30;
     private static final String TAG = "MustacheEffectForMeThread";
     private PlayRTCVideoView mLocalView;
     private PlayRTCVideoView mRemoteView;
@@ -74,7 +73,7 @@ public class MustacheEffectForMeThread extends Thread {
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onSnapshotImage(Bitmap image) {
-                if (image != null) {
+                if (image != null && mThreadFlag && mLocalView != null) {
                     mBitmapQueue.add(image);
                 }
             }
@@ -94,7 +93,7 @@ public class MustacheEffectForMeThread extends Thread {
     public void run() {
         while (mThreadFlag) {
             try {
-                if (mLocalView != null) {
+                if (mLocalView != null&&mThreadFlag) {
 
                     makeSanpshot();
                     detectSnapShot();
@@ -173,10 +172,10 @@ public class MustacheEffectForMeThread extends Thread {
                 mEffect.setVisibility(View.VISIBLE);
                 for (Landmark landmark : face.getLandmarks()) {
                     if (landmark.getType() == Landmark.NOSE_BASE) {
-                        int x = mPoint.x - (int) (mLayout.getWidth() * 0.3) - MARGIN;
-                        int y = mPoint.y - (int) (mLayout.getHeight() * 0.3) - MARGIN;
+                        int x = mPoint.x - (int) (mLayout.getWidth() * 0.3) - 80;
+                        int y = mPoint.y - (int) (mLayout.getHeight() * 0.3)- 50;
                         mEffect.setX((int) (x + landmark.getPosition().x * 10));
-                        mEffect.setY((int) (landmark.getPosition().y * 10));
+                        mEffect.setY((int) (landmark.getPosition().y * 10)+5);
                         mLayout.updateViewLayout(mEffect, mParam);
                         break;
                         //    Log.d(TAG, "인식 x: " + (int) (face.getLandmarks().get(2).getPosition().x * 5) + " y: " + (int) (face.getLandmarks().get(2).getPosition().y * 5));

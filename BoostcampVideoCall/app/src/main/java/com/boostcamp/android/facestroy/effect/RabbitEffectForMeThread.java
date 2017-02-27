@@ -33,7 +33,6 @@ import java.util.Queue;
 
 public class RabbitEffectForMeThread extends Thread {
 
-    private static final int MARGIN = 30;
     private static final String TAG = "RabbitEffect";
     private PlayRTCVideoView mLocalView;
     private PlayRTCVideoView mRemoteView;
@@ -71,7 +70,7 @@ public class RabbitEffectForMeThread extends Thread {
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onSnapshotImage(Bitmap image) {
-                if (image != null) {
+                if (image != null && mThreadFlag && mLocalView != null) {
                     mBitmapQueue.add(image);
                 }
             }
@@ -107,7 +106,7 @@ public class RabbitEffectForMeThread extends Thread {
     public void run() {
         while (mThreadFlag) {
             try {
-                if (mLocalView != null) {
+                if (mLocalView != null&&mThreadFlag) {
                     makeSanpshot();
                     detectSnapShot();
                     sleep(50);
@@ -187,11 +186,11 @@ public class RabbitEffectForMeThread extends Thread {
                 for (Landmark landmark : face.getLandmarks()) {
 
                     if (landmark.getType() == Landmark.NOSE_BASE) {
-                        int x = mPoint.x - (int) (mLayout.getWidth() * 0.3) - MARGIN;
-                        int y = mPoint.y - (int) (mLayout.getHeight() * 0.3) - MARGIN;
+                        int x = mPoint.x - (int) (mLayout.getWidth() * 0.3);
+                        int y = mPoint.y - (int) (mLayout.getHeight() * 0.3) - 50;
 
-                        mEffect.setX((int) (x + landmark.getPosition().x * 2 - 330));
-                        mEffect.setY((int) (landmark.getPosition().y * 2) - 530);
+                        mEffect.setX((int) (x + landmark.getPosition().x * 2 - 280));
+                        mEffect.setY((int) (landmark.getPosition().y * 2) - 550);
                         mLayout.updateViewLayout(mEffect, mParam);
 
                         //    Log.d(TAG, "인식 x: " + (int) (face.getLandmarks().get(2).getPosition().x * 5) + " y: " + (int) (face.getLandmarks().get(2).getPosition().y * 5));

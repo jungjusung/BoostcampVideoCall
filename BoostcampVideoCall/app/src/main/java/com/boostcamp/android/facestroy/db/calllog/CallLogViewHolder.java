@@ -104,11 +104,21 @@ public class CallLogViewHolder extends RecyclerView.ViewHolder {
         if (diffDays == 0) {
             String flag;
             String timeFlag = mContext.getResources().getString(R.string.time_flag);
+            String hour,minutes;
+            if(before.get(Calendar.HOUR)<10)
+                hour=mContext.getResources().getString(R.string.zero)+before.get(Calendar.HOUR);
+            else
+                hour=before.get(Calendar.HOUR)+"";
+            if(before.get(Calendar.MINUTE)<10)
+                minutes=mContext.getResources().getString(R.string.zero)+before.get(Calendar.MINUTE);
+            else
+                minutes=before.get(Calendar.MINUTE)+"";
             if (before.get(Calendar.HOUR) > 12)
                 flag = mContext.getResources().getString(R.string.pm);
             else
                 flag = mContext.getResources().getString(R.string.am);
-            return flag + before.get(Calendar.HOUR) + timeFlag + before.get(Calendar.HOUR);
+
+            return flag + hour + timeFlag + minutes;
         }
 
         // 하루전

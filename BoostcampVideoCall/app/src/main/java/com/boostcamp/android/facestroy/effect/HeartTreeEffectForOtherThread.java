@@ -63,7 +63,7 @@ public class HeartTreeEffectForOtherThread extends Thread {
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onSnapshotImage(Bitmap image) {
-                if (image != null) {
+                if (image != null && mRemoteView != null && mThreadFlag) {
                     mBitmapQueue.add(image);
                 }
             }
@@ -91,7 +91,7 @@ public class HeartTreeEffectForOtherThread extends Thread {
     public void run() {
         while (mThreadFlag) {
             try {
-                if (mRemoteView != null) {
+                if (mRemoteView != null&&mThreadFlag) {
                     makeSanpshot();
                     detectSnapShot();
                     sleep(30);

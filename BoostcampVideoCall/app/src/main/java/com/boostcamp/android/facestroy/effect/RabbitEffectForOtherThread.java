@@ -59,8 +59,6 @@ public class RabbitEffectForOtherThread extends Thread {
         mSafeDetector = new SafeFaceDetector(mFaceDetector);
 
 
-
-
         Glide.with(context)
                 .load(R.drawable.rabbit)
                 .asGif()
@@ -74,7 +72,7 @@ public class RabbitEffectForOtherThread extends Thread {
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onSnapshotImage(Bitmap image) {
-                if (image != null) {
+                if (image != null && mRemoteView != null && mThreadFlag) {
                     mBitmapQueue.add(image);
                 }
             }
@@ -90,7 +88,7 @@ public class RabbitEffectForOtherThread extends Thread {
     public void run() {
         while (mThreadFlag) {
             try {
-                if (mRemoteView != null) {
+                if (mRemoteView != null && mThreadFlag) {
                     makeSanpshot();
                     detectSnapShot();
                     sleep(30);
@@ -126,7 +124,7 @@ public class RabbitEffectForOtherThread extends Thread {
         myBitmap.recycle();
 
         if (faces.size() == 0) {
-            if (mEffect!=null&&mEffect.getVisibility() == View.VISIBLE)
+            if (mEffect != null && mEffect.getVisibility() == View.VISIBLE)
                 new myAsyncInVisible().execute();
             else
                 return;
@@ -173,7 +171,7 @@ public class RabbitEffectForOtherThread extends Thread {
                         mEffect.setX((int) (landmark.getPosition().x * 10 - 700));
                         mEffect.setY((int) (landmark.getPosition().y * 10 - 1900));
                         mLayout.updateViewLayout(mEffect, mParam);
-                        
+
                     }
                 }
             }

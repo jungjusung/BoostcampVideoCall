@@ -81,7 +81,7 @@ public class HeartTreeEffectForMeThread extends Thread {
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onSnapshotImage(Bitmap image) {
-                if (image != null) {
+                if (image != null && mThreadFlag && mLocalView != null) {
                     mBitmapQueue.add(image);
                 }
             }
@@ -106,12 +106,11 @@ public class HeartTreeEffectForMeThread extends Thread {
     public void run() {
         while (mThreadFlag) {
             try {
-                if (mLocalView != null) {
+                if (mLocalView != null && mThreadFlag) {
                     makeSanpshot();
                     detectSnapShot();
                     sleep(50);
                 }
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -120,7 +119,7 @@ public class HeartTreeEffectForMeThread extends Thread {
     }
 
     private synchronized void makeSanpshot() {
-        if (mLocalView != null && mSnapShot != null&& mThreadFlag) {
+        if (mLocalView != null && mSnapShot != null && mThreadFlag) {
             mLocalView.snapshot(mSnapShot);
         }
     }
@@ -143,7 +142,7 @@ public class HeartTreeEffectForMeThread extends Thread {
         myBitmap.recycle();
 
         if (faces.size() == 0) {
-            if (mEffect!=null&&mEffect.getVisibility() == View.VISIBLE)
+            if (mEffect != null && mEffect.getVisibility() == View.VISIBLE)
                 new myAsyncInVisible().execute();
             else
                 return;

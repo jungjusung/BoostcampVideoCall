@@ -193,6 +193,10 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 mMyVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
 
                 if (mReceiveLocalView != null) {
+
+                    mHeartTreeEffectForMeThread = new HeartTreeEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
+                    mMustacheEffectForMeThread = new MustacheEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
+                    mRabbitEffectForMeThread = new RabbitEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
                     makeHeartThread();
                     makeMustacheThread();
                     makeRabbitThread();
@@ -301,6 +305,8 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        exitThread();
+        exitOtherThread();
         mReceiveLocalView = null;
         mReceiveRemoteView = null;
 
@@ -346,7 +352,7 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 } else if (mMenuButton.getVisibility() == View.INVISIBLE) {
                     mMenuButton.setVisibility(View.VISIBLE);
                 } else {
-                    mMenuButton.setVisibility(View.INVISIBLE);
+                    mMenuButton.setVisibility(View.GONE);
                 }
                 return true;
             }
@@ -368,17 +374,16 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 finish();
                 break;
             case R.id.btn_effect:
-                mMenuButton.setVisibility(View.INVISIBLE);
+                mMenuButton.setVisibility(View.GONE);
                 mEffectButton.setVisibility(View.VISIBLE);
                 break;
             case R.id.btn_rotation:
                 //전환
                 break;
             case R.id.effect_heartTree:
-                if (mHeartTreeEffectForMeThread == null) {
+                if (mHeartTreeEffectForMeThread != null) {
                     effect = "heart";
                     check = "start";
-                    mHeartTreeEffectForMeThread = new HeartTreeEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
                     mHeartTreeEffectForMeThread.start();
                     new SenderAsync().execute(url, mToken, effect, sender, check, point);
                     btnSetEnabled(Constant.EFFECT_TREEHEART);
@@ -386,27 +391,24 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 break;
             case R.id.effect_mustache:
 
-                if (mMustacheEffectForMeThread == null) {
+                if (mMustacheEffectForMeThread != null) {
                     effect = "mustache";
                     check = "start";
-                    mMustacheEffectForMeThread = new MustacheEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
                     mMustacheEffectForMeThread.start();
                     new SenderAsync().execute(url, mToken, effect, sender, check, point);
                     btnSetEnabled(Constant.EFFECT_MUSTACHE);
                 }
                 break;
             case R.id.effect_rabbit:
-                if (mRabbitEffectForMeThread == null) {
+                if (mRabbitEffectForMeThread != null) {
                     effect = "rabbit";
                     check = "start";
-                    mRabbitEffectForMeThread = new RabbitEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
                     mRabbitEffectForMeThread.start();
                     new SenderAsync().execute(url, mToken, effect, sender, check, point);
                     btnSetEnabled(Constant.EFFECT_RABBIT);
                 }
                 break;
             case R.id.btn_effect_exit:
-                //exitOtherThread();
                 exitThread();
                 allBtnSetEnabled();
                 break;
@@ -442,9 +444,7 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
 
             mHeartTreeEffectForMeThread.stopThread();
             mHeartTreeEffectForMeThread.effectOff();
-
-            mHeartTreeEffectForMeThread = null;
-
+            mHeartTreeEffectForMeThread = new HeartTreeEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
             new SenderAsync().execute(url, mToken, effect, sender, check, point);
         }
         if (mMustacheEffectForMeThread != null) {
@@ -453,7 +453,8 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
 
             mMustacheEffectForMeThread.stopThread();
             mMustacheEffectForMeThread.effectOff();
-            mMustacheEffectForMeThread = null;
+
+            mMustacheEffectForMeThread = new MustacheEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
             new SenderAsync().execute(url, mToken, effect, sender, check, point);
         }
 
@@ -462,7 +463,8 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
             check = "end";
             mRabbitEffectForMeThread.stopThread();
             mRabbitEffectForMeThread.effectOff();
-            mRabbitEffectForMeThread = null;
+
+            mRabbitEffectForMeThread = new RabbitEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
             new SenderAsync().execute(url, mToken, effect, sender, check, point);
         }
 
