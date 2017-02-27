@@ -52,8 +52,8 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
 
 
     private int[] mIcon = {R.drawable.ic_contacts, R.drawable.ic_video_call, R.drawable.ic_theaters};
-    private String[] mColor = {getString(R.string.first_color),getString(R.string.second_color),getString(R.string.third_color)};
-    private String[] mTitles = {getString(R.string.phone),getString(R.string.history), getString(R.string.record)};
+    private String[] mColor;
+    private String[] mTitles;
 
     private Realm mRealm;
     private MyInfo mMyInformtaion;
@@ -63,7 +63,8 @@ public class MainActivity extends AppCompatActivity implements MemberAdapter.Lis
         setTheme(R.style.myNoActionBar);
         setContentView(R.layout.activity_main);
         mRealm = Realm.getDefaultInstance();
-
+        mTitles= new String[]{getString(R.string.phone),getString(R.string.history), getString(R.string.record)};
+        mColor=new String[]{getString(R.string.first_color),getString(R.string.second_color),getString(R.string.third_color)};
     }
 
     public void initUI() {
