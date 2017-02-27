@@ -121,7 +121,8 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
             mName.setText(member.getName());
             mPhoneNumber.setText(member.getPhoneNumber());
             mStatus.setText(member.getStatus());
-            mCount.setText(member.getCount() + "회");
+            String count=getResources().getString(R.string.count);
+            mCount.setText(member.getCount()+count);
             mTime.setText(Utill.timeToString(getApplicationContext(),member.getTime()));
             container.addView(view);
             return view;

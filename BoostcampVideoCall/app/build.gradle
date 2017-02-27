@@ -47,6 +47,7 @@ dependencies {
     compile 'com.android.support:design:25.1.0'
     compile 'gun0912.ted:tedpermission:1.0.3'
     compile 'com.github.florent37:materialtextfield:1.0.7'
+    compile 'com.pnikosis:materialish-progress:1.7'
     testCompile 'junit:junit:4.12'
 
 }

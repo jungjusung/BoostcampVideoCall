@@ -10,4 +10,8 @@
     <color name="accent">#47d5dc</color>
     <color name="black">#15344d</color>
     <color name="darkgray">#676768</color>
+    <color name="aDark">#70484747</color>
+    <color name="aUse">#862fe1ea</color>
+    <color name="white">#ffffff</color>
+    <color name="aNot">#701b1b1b</color>
 </resources>

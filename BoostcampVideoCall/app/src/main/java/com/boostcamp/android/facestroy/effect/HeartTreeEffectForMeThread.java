@@ -44,7 +44,7 @@ public class HeartTreeEffectForMeThread extends Thread {
     private Context mContext;
     private Detector<Face> mSafeDetector;
     private Queue<Bitmap> mBitmapQueue = new LinkedList<>();
-
+    private PlayRTCVideoView.SnapshotObserver mSnapShot;
     private RelativeLayout mLayout;
     private RelativeLayout.LayoutParams mParam;
     private int mLocation[] = new int[2];
@@ -65,6 +65,9 @@ public class HeartTreeEffectForMeThread extends Thread {
 
         localView.getLocationOnScreen(mLocation);
 
+        mEffect = new Effect(context, 0, 0, 150, 100);
+        mEffect.setVisibility(View.GONE);
+
         mFaceDetector = new
                 FaceDetector.Builder(context)
                 .setLandmarkType(FaceDetector.ALL_LANDMARKS)
@@ -73,7 +76,16 @@ public class HeartTreeEffectForMeThread extends Thread {
         mSafeDetector = new SafeFaceDetector(mFaceDetector);
 
 
-        mEffect = new Effect(context, 0, 0, 150, 100);
+        mSnapShot = new PlayRTCVideoView.SnapshotObserver() {
+
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            public void onSnapshotImage(Bitmap image) {
+                if (image != null) {
+                    mBitmapQueue.add(image);
+                }
+            }
+        };
 
         Glide.with(context)
                 .load(R.drawable.heart_tree)
@@ -81,7 +93,6 @@ public class HeartTreeEffectForMeThread extends Thread {
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(mEffect);
 
-        mEffect.setVisibility(View.GONE);
         mParam = new RelativeLayout.LayoutParams(200, 220);
 
 
@@ -109,16 +120,9 @@ public class HeartTreeEffectForMeThread extends Thread {
     }
 
     private synchronized void makeSanpshot() {
-        mLocalView.snapshot(new PlayRTCVideoView.SnapshotObserver() {
-
-            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-            @Override
-            public void onSnapshotImage(Bitmap image) {
-                if (image != null) {
-                    mBitmapQueue.add(image);
-                }
-            }
-        });
+        if (mLocalView != null && mSnapShot != null&& mThreadFlag) {
+            mLocalView.snapshot(mSnapShot);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -139,7 +143,7 @@ public class HeartTreeEffectForMeThread extends Thread {
         myBitmap.recycle();
 
         if (faces.size() == 0) {
-            if (mEffect.getVisibility() == View.VISIBLE)
+            if (mEffect!=null&&mEffect.getVisibility() == View.VISIBLE)
                 new myAsyncInVisible().execute();
             else
                 return;
@@ -176,7 +180,7 @@ public class HeartTreeEffectForMeThread extends Thread {
         protected void onPostExecute(Face face) {
 
             super.onPostExecute(face);
-            if (face != null) {
+            if (face != null && mThreadFlag) {
                 mEffect.setVisibility(View.VISIBLE);
                 for (Landmark landmark : face.getLandmarks()) {
 
@@ -194,12 +198,15 @@ public class HeartTreeEffectForMeThread extends Thread {
     }
 
     public void stopThread() {
+        mBitmapQueue.clear();
         mThreadFlag = false;
         interrupt();
+
     }
 
     public void effectOff() {
         mEffect.setVisibility(View.GONE);
+        mEffect = null;
     }
 
     public boolean isRunning() {
@@ -208,6 +215,7 @@ public class HeartTreeEffectForMeThread extends Thread {
 
     public void effectOn() {
         mEffect.setVisibility(View.VISIBLE);
+
     }
 
     public void restartThread() {

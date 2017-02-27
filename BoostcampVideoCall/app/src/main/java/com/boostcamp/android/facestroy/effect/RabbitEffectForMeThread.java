@@ -43,7 +43,7 @@ public class RabbitEffectForMeThread extends Thread {
     private FaceDetector mFaceDetector;
     private Detector<Face> mSafeDetector;
     private Queue<Bitmap> mBitmapQueue = new LinkedList<>();
-
+    private PlayRTCVideoView.SnapshotObserver mSnapShot;
 
     private RelativeLayout mLayout;
     private RelativeLayout.LayoutParams mParam;
@@ -64,6 +64,18 @@ public class RabbitEffectForMeThread extends Thread {
         display.getSize(mPoint);
 
         localView.getLocationOnScreen(mLocation);
+        mEffect = new Effect(context, 0, 0, 150, 100);
+        mEffect.setVisibility(View.GONE);
+        mSnapShot = new PlayRTCVideoView.SnapshotObserver() {
+
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            public void onSnapshotImage(Bitmap image) {
+                if (image != null) {
+                    mBitmapQueue.add(image);
+                }
+            }
+        };
 
         mFaceDetector = new
                 FaceDetector.Builder(context)
@@ -73,7 +85,7 @@ public class RabbitEffectForMeThread extends Thread {
         mSafeDetector = new SafeFaceDetector(mFaceDetector);
 
 
-        mEffect = new Effect(context, 0, 0, 150, 100);
+
 
         Glide.with(context)
                 .load(R.drawable.rabbit)
@@ -81,8 +93,8 @@ public class RabbitEffectForMeThread extends Thread {
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(mEffect);
 
-        mEffect.setVisibility(View.INVISIBLE);
-        mParam = new RelativeLayout.LayoutParams(700, 730);
+
+        mParam = new RelativeLayout.LayoutParams(500, 530);
 
 
         mEffect.setLayoutParams(mParam);
@@ -109,16 +121,9 @@ public class RabbitEffectForMeThread extends Thread {
     }
 
     private synchronized void makeSanpshot() {
-        mLocalView.snapshot(new PlayRTCVideoView.SnapshotObserver() {
-
-            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-            @Override
-            public void onSnapshotImage(Bitmap image) {
-                if (image != null) {
-                    mBitmapQueue.add(image);
-                }
-            }
-        });
+        if (mLocalView != null && mSnapShot != null && mThreadFlag) {
+            mLocalView.snapshot(mSnapShot);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -139,7 +144,7 @@ public class RabbitEffectForMeThread extends Thread {
         myBitmap.recycle();
 
         if (faces.size() == 0) {
-            if (mEffect.getVisibility() == View.VISIBLE)
+            if (mEffect!=null&&mEffect.getVisibility() == View.VISIBLE)
                 new myAsyncInVisible().execute();
             else
                 return;
@@ -177,7 +182,7 @@ public class RabbitEffectForMeThread extends Thread {
         protected void onPostExecute(Face face) {
 
             super.onPostExecute(face);
-            if (face != null) {
+            if (face != null && mThreadFlag) {
                 mEffect.setVisibility(View.VISIBLE);
                 for (Landmark landmark : face.getLandmarks()) {
 
@@ -197,12 +202,16 @@ public class RabbitEffectForMeThread extends Thread {
     }
 
     public void stopThread() {
+        mBitmapQueue.clear();
+
         mThreadFlag = false;
         interrupt();
+
     }
 
     public void effectOff() {
-        mEffect.setVisibility(View.INVISIBLE);
+        mEffect.setVisibility(View.GONE);
+        mEffect = null;
     }
 
     public boolean isRunning() {

@@ -36,7 +36,7 @@ public class MustacheEffectForOtherThread extends Thread {
     private FaceDetector mFaceDetector;
     private Detector<Face> mSafeDetector;
     private Queue<Bitmap> mBitmapQueue = new LinkedList<>();
-
+    private PlayRTCVideoView.SnapshotObserver mSnapShot;
 
     private RelativeLayout mLayout;
     private RelativeLayout.LayoutParams mParam;
@@ -47,7 +47,8 @@ public class MustacheEffectForOtherThread extends Thread {
         this.mRemoteView = remoteView;
         this.mContext = context;
         mLayout = relativeLayout;
-
+        mEffect = new Effect(context, 0, 0, 150, 100);
+        mEffect.setVisibility(View.GONE);
         mFaceDetector = new
                 FaceDetector.Builder(context)
                 .setLandmarkType(FaceDetector.ALL_LANDMARKS)
@@ -55,9 +56,19 @@ public class MustacheEffectForOtherThread extends Thread {
                 .build();
         mSafeDetector = new SafeFaceDetector(mFaceDetector);
 
-        mEffect = new Effect(context,0,0, 150, 100);
+        mSnapShot = new PlayRTCVideoView.SnapshotObserver() {
+
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            public void onSnapshotImage(Bitmap image) {
+                if (image != null) {
+                    mBitmapQueue.add(image);
+                }
+            }
+        };
+
         mEffect.setBackgroundResource(R.drawable.effect1);
-        mEffect.setVisibility(View.INVISIBLE);
+
         mParam = new RelativeLayout.LayoutParams(250, 120);
 
 
@@ -84,17 +95,10 @@ public class MustacheEffectForOtherThread extends Thread {
         }
     }
 
-    private synchronized void makeSanpshot() {
-        mRemoteView.snapshot(new PlayRTCVideoView.SnapshotObserver() {
-
-            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-            @Override
-            public void onSnapshotImage(Bitmap image) {
-                if (image != null) {
-                    mBitmapQueue.add(image);
-                }
-            }
-        });
+    public synchronized void makeSanpshot() {
+        if (mRemoteView != null && mSnapShot != null && mThreadFlag) {
+            mRemoteView.snapshot(mSnapShot);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -113,7 +117,7 @@ public class MustacheEffectForOtherThread extends Thread {
         myBitmap.recycle();
 
         if (faces.size() == 0) {
-            if (mEffect.getVisibility() == View.VISIBLE)
+            if (mEffect!=null&&mEffect.getVisibility() == View.VISIBLE)
                 new myAsyncInVisible().execute();
             else
                 return;
@@ -151,11 +155,11 @@ public class MustacheEffectForOtherThread extends Thread {
         protected void onPostExecute(Face face) {
 
             super.onPostExecute(face);
-            if (face != null) {
+            if (face != null && mThreadFlag) {
                 mEffect.setVisibility(View.VISIBLE);
                 for (Landmark landmark : face.getLandmarks()) {
                     if (landmark.getType() == Landmark.NOSE_BASE) {
-                        mEffect.setX((int) (landmark.getPosition().x * 10-30));
+                        mEffect.setX((int) (landmark.getPosition().x * 10 - 50));
                         mEffect.setY((int) (landmark.getPosition().y * 10));
                         mLayout.updateViewLayout(mEffect, mParam);
                         break;
@@ -165,24 +169,31 @@ public class MustacheEffectForOtherThread extends Thread {
             }
         }
     }
-    public void stopThread(){
-        mThreadFlag =false;
+
+    public void stopThread() {
+        mBitmapQueue.clear();
+
+        mThreadFlag = false;
         interrupt();
+
     }
-    public void effectOff(){
-        mEffect.setVisibility(View.INVISIBLE);
+
+    public void effectOff() {
+        mEffect.setVisibility(View.GONE);
+        mEffect = null;
     }
 
 
-    public boolean isRunning(){
+    public boolean isRunning() {
         return mThreadFlag;
     }
 
-    public void effectOn(){
+    public void effectOn() {
         mEffect.setVisibility(View.VISIBLE);
     }
-    public void restartThread(){
-        mThreadFlag =true;
+
+    public void restartThread() {
+        mThreadFlag = true;
         interrupt();
     }
 }

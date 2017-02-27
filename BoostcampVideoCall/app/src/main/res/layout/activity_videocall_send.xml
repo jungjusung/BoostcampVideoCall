@@ -106,13 +106,18 @@
         android:layout_height="wrap_content"
         android:background="#70484747"
         android:layout_gravity="center|bottom"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+
         >
         <LinearLayout
             android:id="@+id/effect_heartTree"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginLeft="50dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+
             >
             <ImageView
                 android:layout_width="40dp"
@@ -133,7 +138,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginLeft="130dp"
+            android:layout_toRightOf="@+id/effect_heartTree"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             >
             <ImageView
                 android:layout_width="40dp"
@@ -154,13 +161,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginRight="130dp"
-            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/effect_mustache"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             >
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/ic_palette"
+                android:background="@drawable/ic_rabbit"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -176,8 +184,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="50dp"
+            android:layout_toRightOf="@+id/effect_rabbit"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             >
             <ImageView
                 android:layout_width="40dp"
@@ -187,9 +196,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:text="@string/effect_exit"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 android:textColor="@android:color/white"
                 />
         </LinearLayout>

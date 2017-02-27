@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -27,7 +28,7 @@ import java.io.IOException;
 
 public class ReceiveCheckActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private static final String TAG="CallReciveActivity";
+    private static final String TAG="ReceiveCheckActivity";
 
     private SurfaceView mFaceView;
     private ShimmerFrameLayout mShimmerLayout;

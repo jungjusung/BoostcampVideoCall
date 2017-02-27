@@ -45,4 +45,5 @@
     <string name="video_call">영상 통화</string>
     <string name="to">To</string>
     <string name="from_call">From</string>
+    <string name="count">회</string>
 </resources>

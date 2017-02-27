@@ -10,6 +10,8 @@ import android.provider.ContactsContract;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.boostcamp.android.facestroy.R;
 import com.boostcamp.android.facestroy.db.Member;
@@ -125,13 +127,13 @@ public class Utill {
         }
     }
 
-    public static String timeToString(Context context,long time) {
+    public static String timeToString(Context context, long time) {
 
         long cTime = time / 1000;
-        long hours,minutes,seconds;
-        String sHours,sMinutes,sSeconds;
-        String timeFlag=context.getResources().getString(R.string.time_flag);
-        String zero=context.getResources().getString(R.string.zero);
+        long hours, minutes, seconds;
+        String sHours, sMinutes, sSeconds;
+        String timeFlag = context.getResources().getString(R.string.time_flag);
+        String zero = context.getResources().getString(R.string.zero);
         minutes = cTime / 60;
         seconds = cTime % 60;
         hours = minutes / 60;
@@ -151,7 +153,7 @@ public class Utill {
             sSeconds = zero + seconds;
         else
             sSeconds = seconds + "";
-        return sHours +timeFlag+ sMinutes + timeFlag + sSeconds;
+        return sHours + timeFlag + sMinutes + timeFlag + sSeconds;
     }
 
     public static void savePhoneInfoToRealm(Context context, final Realm realm) {
@@ -196,11 +198,11 @@ public class Utill {
                                 newMember.setCount(0);
                                 newMember.setTime(0);
 
-                                if(member.getStatus().equals(""))
+                                if (member.getStatus().equals(""))
                                     newMember.setStatus("");
                                 else
                                     newMember.setStatus(member.getStatus());
-                                if(member.getStatus().equals(""))
+                                if (member.getStatus().equals(""))
                                     newMember.setUrl(member.getUrl());
                                 realm.insertOrUpdate(newMember);
                                 realm.commitTransaction();
@@ -258,7 +260,7 @@ public class Utill {
         });
     }
 
-    public static void requestEffect(String urlString, String token, String effect, String sender,String check,String point) {
+    public static void requestEffect(String urlString, String token, String effect, String sender, String check, String point) {
 
         try {
 
@@ -269,7 +271,8 @@ public class Utill {
             con.setDoOutput(true);
 
             BufferedWriter buffw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
-            buffw.write("token=" + token + "&mEffect=" + effect + "&sender=" + sender+"&check="+check+"&point="+point);
+            buffw.write("token=" + token + "&effect=" + effect + "&sender=" + sender + "&check=" + check + "&point=" + point);
+            Log.d("Utill", "token=" + token + "&effect=" + effect + "&sender=" + sender + "&check=" + check + "&point=" + point);
             buffw.flush();
             con.getResponseCode();
             con.disconnect();
@@ -278,7 +281,7 @@ public class Utill {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
         }
     }
 
@@ -303,11 +306,69 @@ public class Utill {
     }
 
     public static void stopRington(MediaPlayer mp) {
-        if(mp!=null) {
+        if (mp != null) {
             if (mp.isPlaying()) {
                 mp.stop();
                 mp.reset();
             }
         }
+    }
+
+    public static void setButtonUseColor(Context context, LinearLayout item, int index) {
+
+        switch (index) {
+            case Constant.EFFECT_TREEHEART:
+                item.getChildAt(0).setBackgroundResource(R.drawable.ic_heart_use);
+                break;
+            case Constant.EFFECT_MUSTACHE:
+                item.getChildAt(0).setBackgroundResource(R.drawable.ic_mustache_use);
+                break;
+
+            case Constant.EFFECT_RABBIT:
+                item.getChildAt(0).setBackgroundResource(R.drawable.ic_rabbit_use);
+                break;
+        }
+        if (android.os.Build.VERSION.SDK_INT >= 23)
+            ((TextView) item.getChildAt(1)).setTextColor(context.getResources().getColor(R.color.accent, null));
+        else
+            ((TextView) item.getChildAt(1)).setTextColor(context.getResources().getColor(R.color.accent));
+    }
+
+    public static void setButtonNotUseColor(Context context, LinearLayout item, int index) {
+
+        switch (index) {
+            case Constant.EFFECT_TREEHEART:
+                item.getChildAt(0).setBackgroundResource(R.drawable.ic_heart_not);
+                break;
+            case Constant.EFFECT_MUSTACHE:
+                item.getChildAt(0).setBackgroundResource(R.drawable.ic_mustache_not);
+                break;
+            case Constant.EFFECT_RABBIT:
+                item.getChildAt(0).setBackgroundResource(R.drawable.ic_rabbit_not);
+                break;
+        }
+        if (android.os.Build.VERSION.SDK_INT >= 23)
+            ((TextView) item.getChildAt(1)).setTextColor(context.getResources().getColor(R.color.colorAccent, null));
+        else
+            ((TextView) item.getChildAt(1)).setTextColor(context.getResources().getColor(R.color.colorAccent));
+    }
+    public static void setButtonDefaultColor(Context context, LinearLayout item, int index) {
+
+        switch (index) {
+            case Constant.EFFECT_TREEHEART:
+                item.getChildAt(0).setBackgroundResource(R.drawable.ic_heart);
+                break;
+
+            case Constant.EFFECT_MUSTACHE:
+                item.getChildAt(0).setBackgroundResource(R.drawable.ic_mustache);
+                break;
+            case Constant.EFFECT_RABBIT:
+                item.getChildAt(0).setBackgroundResource(R.drawable.ic_rabbit);
+                break;
+        }
+        if (android.os.Build.VERSION.SDK_INT >= 23)
+            ((TextView) item.getChildAt(1)).setTextColor(context.getResources().getColor(R.color.white, null));
+        else
+            ((TextView) item.getChildAt(1)).setTextColor(context.getResources().getColor(R.color.white));
     }
 }

@@ -3,6 +3,7 @@ package com.boostcamp.android.facestroy.activity;
 import com.boostcamp.android.facestroy.R;
 import com.boostcamp.android.facestroy.db.CallLog;
 import com.boostcamp.android.facestroy.db.Member;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
@@ -48,7 +49,7 @@ import io.realm.Realm;
  * Created by Jusung on 2017. 2. 20..
  */
 
-public class ReceiveCallActivity extends AppCompatActivity implements View.OnTouchListener,View.OnClickListener{
+public class ReceiveCallActivity extends AppCompatActivity implements View.OnTouchListener, View.OnClickListener {
 
     private static final String TAG = "ReceiveCallActivity";
 
@@ -56,15 +57,15 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
     private PlayRTC mPlayrtc;
 
     //뷰 관련 멤버 변수
-    public static PlayRTCVideoView mLocalView;
-    public static PlayRTCVideoView mRemoteView;
-    private RelativeLayout mAfterLayout,mMenuButton,mEffectButton;
-    private LinearLayout mBtnExit,mBtnEffect, mBtnRotation,mEffectHeart, mEffectRabbit, mEffectMustache, mEffectExit;
-    private String mName,mPhoneNumber,mToken,mChannelId,mSender;
+    public static PlayRTCVideoView mReceiveLocalView;
+    public static PlayRTCVideoView mReceiveRemoteView;
+    private RelativeLayout mAfterLayout, mMenuButton, mEffectButton;
+    private LinearLayout mBtnExit, mBtnEffect, mBtnRotation, mEffectHeart, mEffectRabbit, mEffectMustache, mEffectExit;
+    private String mName, mPhoneNumber, mToken, mChannelId, mSender;
     private Realm mRealm;
     private Date mDate;
-    private long mStartTime,mEndTime;
-    private List<LinearLayout> mEffectList =new LinkedList<>();
+    private long mStartTime, mEndTime;
+    private List<LinearLayout> mEffectList = new LinkedList<>();
     private HeartTreeEffectForMeThread mHeartTreeEffectForMeThread;
     private MustacheEffectForMeThread mMustacheEffectForMeThread;
     private RabbitEffectForMeThread mRabbitEffectForMeThread;
@@ -84,15 +85,15 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
         mContext = getApplication();
 
 
-        mMenuButton=(RelativeLayout)findViewById(R.id.menu_button);
-        mAfterLayout=(RelativeLayout)findViewById(R.id.video_view_group);
+        mMenuButton = (RelativeLayout) findViewById(R.id.menu_button);
+        mAfterLayout = (RelativeLayout) findViewById(R.id.video_view_group);
 
-        mEffectButton=(RelativeLayout) findViewById(R.id.effect_button);
+        mEffectButton = (RelativeLayout) findViewById(R.id.effect_button);
         mEffectButton.bringToFront();
 
-        mBtnEffect=(LinearLayout)findViewById(R.id.btn_effect);
-        mBtnExit=(LinearLayout)findViewById(R.id.btn_exit);
-        mBtnRotation =(LinearLayout)findViewById(R.id.btn_rotation);
+        mBtnEffect = (LinearLayout) findViewById(R.id.btn_effect);
+        mBtnExit = (LinearLayout) findViewById(R.id.btn_exit);
+        mBtnRotation = (LinearLayout) findViewById(R.id.btn_rotation);
         mBtnEffect.setOnClickListener(this);
         mBtnExit.setOnClickListener(this);
         mBtnRotation.setOnClickListener(this);
@@ -107,13 +108,19 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
         mEffectList.add(mEffectMustache);
         mEffectList.add(mEffectRabbit);
 
-        Intent intent=getIntent();
-        mName=intent.getStringExtra("name");
-        mPhoneNumber=intent.getStringExtra("phoneNumber");
-        mToken=intent.getStringExtra("token");
-        mChannelId=intent.getStringExtra("channelId");
-        mSender=intent.getStringExtra("sender");
-        mRealm=Realm.getDefaultInstance();
+        mEffectHeart.setOnClickListener(this);
+        mEffectRabbit.setOnClickListener(this);
+        mEffectMustache.setOnClickListener(this);
+        mEffectExit.setOnClickListener(this);
+
+
+        Intent intent = getIntent();
+        mName = intent.getStringExtra("name");
+        mPhoneNumber = intent.getStringExtra("phoneNumber");
+        mToken = intent.getStringExtra("token");
+        mChannelId = intent.getStringExtra("channelId");
+        mSender = intent.getStringExtra("sender");
+        mRealm = Realm.getDefaultInstance();
         createPlayRTCInstance();
         connectChannel(mChannelId);
     }
@@ -139,12 +146,8 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
 
 
         settings.setAndroidContext(getApplicationContext());
-
-
         settings.setPrevUserMediaEnable(true);
-
         settings.setProjectId(Constant.KEY);
-
         // video는 기본 640x480 30 frame
         settings.video.setEnable(true);
         settings.video.setCameraType(PlayRTCVideoConfig.CameraType.Front);
@@ -164,14 +167,14 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 if (channelId != null) {
 
                     long delayTime = 0;
-                    mRemoteView.show(delayTime);
-                    mLocalView.show(delayTime);
+                    mReceiveRemoteView.show(delayTime);
+                    mReceiveLocalView.show(delayTime);
                     Log.d(TAG, channelId);
                     String channel = channelId.trim();
                     Log.d(TAG, channel);
                 }
                 if (reason.equals("connect")) {
-                    mStartTime=System.currentTimeMillis();
+                    mStartTime = System.currentTimeMillis();
                     Log.d(TAG, "connect");
                 }
             }
@@ -179,19 +182,22 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
             @Override
             public void onAddLocalStream(PlayRTC playRTC, PlayRTCMedia playRTCMedia) {
                 long delayTime = 0;
-                mLocalView.show(delayTime);
-                playRTCMedia.setVideoRenderer(mLocalView.getVideoRenderer());
+                mReceiveLocalView.show(delayTime);
+                playRTCMedia.setVideoRenderer(mReceiveLocalView.getVideoRenderer());
             }
 
             @Override
             public void onAddRemoteStream(PlayRTC playRTC, String s, String s1, PlayRTCMedia playRTCMedia) {
                 long delayTime = 0;
-                mRemoteView.show(delayTime);
+                mReceiveRemoteView.show(delayTime);
                 mMyVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
-                if (mLocalView != null) {
-                    makeThread();
+
+                if (mReceiveLocalView != null) {
+                    makeHeartThread();
+                    makeMustacheThread();
+                    makeRabbitThread();
                 }
-                playRTCMedia.setVideoRenderer(mRemoteView.getVideoRenderer());
+                playRTCMedia.setVideoRenderer(mReceiveRemoteView.getVideoRenderer());
             }
 
             @Override
@@ -232,22 +238,22 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
     }
 
     private void createVideoView() {
-        if (mLocalView != null) {
+        if (mReceiveLocalView != null) {
             return;
         }
         Point myViewDimensions = new Point();
         myViewDimensions.x = mAfterLayout.getWidth();
         myViewDimensions.y = mAfterLayout.getHeight();
-        if (mRemoteView == null) {
+        if (mReceiveRemoteView == null) {
             createRemoteVideoView(myViewDimensions, mAfterLayout);
         }
-        if (mLocalView == null) {
+        if (mReceiveLocalView == null) {
             createLocalVideoView(myViewDimensions, mAfterLayout);
         }
     }
 
     private void createLocalVideoView(Point parentViewDimensions, RelativeLayout parentVideoViewGroup) {
-        if (mLocalView == null) {
+        if (mReceiveLocalView == null) {
             Point myVideoSize = new Point();
             myVideoSize.x = (int) (parentViewDimensions.x * 0.3);
             myVideoSize.y = (int) (parentViewDimensions.y * 0.3);
@@ -257,61 +263,63 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
             param.addRule(RelativeLayout.ALIGN_PARENT_TOP);
             param.setMargins(30, 30, 30, 30);
 
-            mLocalView = new PlayRTCVideoView(parentVideoViewGroup.getContext());
-            mLocalView.setMirror(false);
+            mReceiveLocalView = new PlayRTCVideoView(parentVideoViewGroup.getContext());
+            mReceiveLocalView.setMirror(false);
 
 
-            mLocalView.setLayoutParams(param);
-            parentVideoViewGroup.addView(mLocalView);
-            mLocalView.setZOrderMediaOverlay(true);
-            mLocalView.initRenderer();
-            mLocalView.setOnTouchListener(this);
+            mReceiveLocalView.setLayoutParams(param);
+            parentVideoViewGroup.addView(mReceiveLocalView);
+            mReceiveLocalView.setZOrderMediaOverlay(true);
+            mReceiveLocalView.initRenderer();
+            mReceiveLocalView.setOnTouchListener(this);
         }
 
     }
 
     private void createRemoteVideoView(final Point parentViewDimensions, RelativeLayout parentVideoViewGroup) {
 
-        if (mRemoteView == null) {
+        if (mReceiveRemoteView == null) {
             Point myVideoSize = new Point();
             myVideoSize.x = parentViewDimensions.x;
             myVideoSize.y = parentViewDimensions.y;
 
             RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-            // Create the mRemoteView.
-            mRemoteView = new PlayRTCVideoView(parentVideoViewGroup.getContext());
-            mRemoteView.setMirror(false);
+            // Create the mReceiveRemoteView.
+            mReceiveRemoteView = new PlayRTCVideoView(parentVideoViewGroup.getContext());
+            mReceiveRemoteView.setMirror(false);
             // Set the layout parameters.
-            mRemoteView.setLayoutParams(param);
+            mReceiveRemoteView.setLayoutParams(param);
 
             // Add the view to the videoViewGroup.
-            parentVideoViewGroup.addView(mRemoteView);
+            parentVideoViewGroup.addView(mReceiveRemoteView);
 
-            mRemoteView.initRenderer();
-            mRemoteView.setOnTouchListener(this);
+            mReceiveRemoteView.initRenderer();
+            mReceiveRemoteView.setOnTouchListener(this);
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mReceiveLocalView = null;
+        mReceiveRemoteView = null;
 
-        mEndTime=System.currentTimeMillis();
-        mDate=new Date(mEndTime);
+        mEndTime = System.currentTimeMillis();
+        mDate = new Date(mEndTime);
 
         mRealm.beginTransaction();
-        long time=mEndTime-mStartTime;
-        Member member=mRealm.where(Member.class).equalTo("token",mSender).findFirst();
-        if(member!=null) {
+        long time = mEndTime - mStartTime;
+        Member member = mRealm.where(Member.class).equalTo("token", mSender).findFirst();
+        if (member != null) {
             member.setCount(member.getCount() + 1);
             member.setTime(member.getTime() + time);
             mRealm.copyToRealmOrUpdate(member);
         }
 
-        int sequenceNum=0;
-        if(mRealm.where(CallLog.class).max("id")!=null)
-            sequenceNum=mRealm.where(CallLog.class).max("id").intValue()+1;
-        CallLog callLog=new CallLog();
+        int sequenceNum = 0;
+        if (mRealm.where(CallLog.class).max("id") != null)
+            sequenceNum = mRealm.where(CallLog.class).max("id").intValue() + 1;
+        CallLog callLog = new CallLog();
         callLog.setId(sequenceNum);
         callLog.setDate(mDate);
         callLog.setTo(FirebaseInstanceId.getInstance().getToken());
@@ -320,10 +328,11 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
         mRealm.insert(callLog);
         mRealm.commitTransaction();
 
-        if(mPlayrtc !=null){
+        if (mPlayrtc != null) {
             mPlayrtc.close();
         }
     }
+
     public boolean onTouch(View view, MotionEvent motionEvent) {
 
         if (mEffectButton.getVisibility() == View.VISIBLE) {
@@ -346,105 +355,137 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
     }
 
 
-
     @Override
     public void onClick(View view) {
-        String from=FirebaseInstanceId.getInstance().getToken();
-        String url="http://1-dot-boostcamp-jusung.appspot.com/mEffect";
-        String effect,check;
-        String postion="receiver";
+        String sender = FirebaseInstanceId.getInstance().getToken();
+        String url = "http://1-dot-boostcamp-jusung.appspot.com/effect";
+        String point = "receiver";
+        String effect, check;
+
         switch (view.getId()) {
             case R.id.btn_exit:
                 mPlayrtc.deleteChannel();
                 finish();
                 break;
             case R.id.btn_effect:
-                //효과
+                mMenuButton.setVisibility(View.INVISIBLE);
+                mEffectButton.setVisibility(View.VISIBLE);
                 break;
             case R.id.btn_rotation:
                 //전환
                 break;
             case R.id.effect_heartTree:
-
-                if (mHeartTreeEffectForMeThread.getState() == Thread.State.NEW) {
-                    effect="heart";
-                    check="start";
-                    Utill.requestEffect(url,mToken,effect,from,check,postion);
+                if (mHeartTreeEffectForMeThread == null) {
+                    effect = "heart";
+                    check = "start";
+                    mHeartTreeEffectForMeThread = new HeartTreeEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
                     mHeartTreeEffectForMeThread.start();
-                } else if (mHeartTreeEffectForMeThread.getState() == Thread.State.RUNNABLE) {
-                    effect="heart";
-                    check="end";
-                    Utill.requestEffect(url,mToken,effect,from,check,postion);
-
-                    mHeartTreeEffectForMeThread.effectOff();
-                    mHeartTreeEffectForMeThread.stopThread();
-                }else if(mHeartTreeEffectForMeThread.getState() == Thread.State.TERMINATED){
-                    mHeartTreeEffectForMeThread.effectOn();
-                    mHeartTreeEffectForMeThread.restartThread();
+                    new SenderAsync().execute(url, mToken, effect, sender, check, point);
+                    btnSetEnabled(Constant.EFFECT_TREEHEART);
                 }
-                btnSetEnabled(Constant.EFFECT_TREEHEART);
                 break;
             case R.id.effect_mustache:
 
-                if (mMustacheEffectForMeThread.getState() == Thread.State.NEW) {
-                    effect="mustache";
-                    check="start";
-                    Utill.requestEffect(url,mToken,effect,from,check,postion);
+                if (mMustacheEffectForMeThread == null) {
+                    effect = "mustache";
+                    check = "start";
+                    mMustacheEffectForMeThread = new MustacheEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
                     mMustacheEffectForMeThread.start();
-                } else if (mMustacheEffectForMeThread.getState() == Thread.State.RUNNABLE) {
-                    effect="mustache";
-                    check="end";
-                    Utill.requestEffect(url,mToken,effect,from,check,postion);
-                    mMustacheEffectForMeThread.effectOff();
-                    mMustacheEffectForMeThread.stopThread();
-                }else if(mMustacheEffectForMeThread.getState() == Thread.State.TERMINATED){
-                    mMustacheEffectForMeThread.effectOn();
-                    mMustacheEffectForMeThread.restartThread();
+                    new SenderAsync().execute(url, mToken, effect, sender, check, point);
+                    btnSetEnabled(Constant.EFFECT_MUSTACHE);
                 }
-                btnSetEnabled(Constant.EFFECT_MUSTACHE);
                 break;
             case R.id.effect_rabbit:
-                if (mRabbitEffectForMeThread.getState() == Thread.State.NEW) {
-                    effect="rabbit";
-                    check="start";
-                    Utill.requestEffect(url,mToken,effect,from,check,postion);
-                    mMustacheEffectForMeThread.effectOff();
+                if (mRabbitEffectForMeThread == null) {
+                    effect = "rabbit";
+                    check = "start";
+                    mRabbitEffectForMeThread = new RabbitEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
                     mRabbitEffectForMeThread.start();
-                } else if (mRabbitEffectForMeThread.getState() == Thread.State.RUNNABLE) {
-                    effect="rabbit";
-                    check="end";
-                    Utill.requestEffect(url,mToken,effect,from,check,postion);
-                    mRabbitEffectForMeThread.effectOff();
-                    mRabbitEffectForMeThread.stopThread();
-                }else if(mRabbitEffectForMeThread.getState() == Thread.State.TERMINATED){
-                    mRabbitEffectForMeThread =new RabbitEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
-                    mRabbitEffectForMeThread.start();
+                    new SenderAsync().execute(url, mToken, effect, sender, check, point);
+                    btnSetEnabled(Constant.EFFECT_RABBIT);
                 }
-                btnSetEnabled(Constant.EFFECT_RABBIT);
                 break;
             case R.id.btn_effect_exit:
+                //exitOtherThread();
                 exitThread();
                 allBtnSetEnabled();
                 break;
         }
     }
-    public void btnSetEnabled(int flag){
-        for(int i=0;i<mEffectList.size();i++){
-            if(flag==i)
-                mEffectList.get(i).setEnabled(true);
 
+    public void btnSetEnabled(int effect) {
+        for(int i=0;i<mEffectList.size();i++){
+            if(effect==i)
+                Utill.setButtonUseColor(mContext,mEffectList.get(i), i);
+            else
+                Utill.setButtonNotUseColor(mContext,mEffectList.get(i),i);
             mEffectList.get(i).setEnabled(false);
         }
     }
-    public void allBtnSetEnabled(){
-        for(LinearLayout btn:mEffectList)
-            btn.setEnabled(true);
+
+    public void allBtnSetEnabled() {
+        for(int i=0;i<mEffectList.size();i++){
+            Utill.setButtonDefaultColor(mContext,mEffectList.get(i),i);
+            mEffectList.get(i).setEnabled(true);
+        }
     }
 
-    public static void exitThread() {
+    public void exitThread() {
+        String sender = FirebaseInstanceId.getInstance().getToken();
+        String url = "http://1-dot-boostcamp-jusung.appspot.com/effect";
+        String point = "receiver";
+
+        String effect, check;
+        if (mHeartTreeEffectForMeThread != null) {
+            effect = "heart";
+            check = "end";
+
+            mHeartTreeEffectForMeThread.stopThread();
+            mHeartTreeEffectForMeThread.effectOff();
+
+            mHeartTreeEffectForMeThread = null;
+
+            new SenderAsync().execute(url, mToken, effect, sender, check, point);
+        }
+        if (mMustacheEffectForMeThread != null) {
+            effect = "mustache";
+            check = "end";
+
+            mMustacheEffectForMeThread.stopThread();
+            mMustacheEffectForMeThread.effectOff();
+            mMustacheEffectForMeThread = null;
+            new SenderAsync().execute(url, mToken, effect, sender, check, point);
+        }
+
+        if (mRabbitEffectForMeThread != null) {
+            effect = "rabbit";
+            check = "end";
+            mRabbitEffectForMeThread.stopThread();
+            mRabbitEffectForMeThread.effectOff();
+            mRabbitEffectForMeThread = null;
+            new SenderAsync().execute(url, mToken, effect, sender, check, point);
+        }
+
+    }
+
+    private class SenderAsync extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... data) {
+            String url = data[0];
+            String token = data[1];
+            String effect = data[2];
+            String sender = data[3];
+            String check = data[4];
+            String point = data[5];
+            Utill.requestEffect(url, token, effect, sender, check, point);
+            return null;
+        }
+    }
+
+    public static void exitOtherThread() {
 
         if (mMustacheEffectForOtherThread != null) {
-            new AsyncTask<Void,Void,Void>(){
+            new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
                     return null;
@@ -454,13 +495,15 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
                     mMustacheEffectForOtherThread.effectOff();
+                    mMustacheEffectForOtherThread.stopThread();
+                    makeMustacheThread();
                 }
             }.execute();
-            mMustacheEffectForOtherThread.stopThread();
+
         }
         if (mRabbitEffectForOtherThread != null) {
 
-            new AsyncTask<Void,Void,Void>(){
+            new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
                     return null;
@@ -470,12 +513,14 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
                     mRabbitEffectForOtherThread.effectOff();
+                    mRabbitEffectForOtherThread.stopThread();
+                    makeRabbitThread();
                 }
             }.execute();
-            mRabbitEffectForOtherThread.stopThread();
+
         }
         if (mHeartTreeEffectForOtherThread != null) {
-            new AsyncTask<Void,Void,Void>(){
+            new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
                     return null;
@@ -485,16 +530,30 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
                     mHeartTreeEffectForOtherThread.effectOff();
+                    mHeartTreeEffectForOtherThread.stopThread();
+                    makeHeartThread();
                 }
             }.execute();
 
-            mHeartTreeEffectForOtherThread.stopThread();
+
         }
     }
-    public static void makeThread(){
-        mMustacheEffectForOtherThread = new MustacheEffectForOtherThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
-        mHeartTreeEffectForOtherThread = new HeartTreeEffectForOtherThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
-        mRabbitEffectForOtherThread = new RabbitEffectForOtherThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
+
+    public static void makeHeartThread() {
+        mHeartTreeEffectForOtherThread = new HeartTreeEffectForOtherThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
+
     }
 
+    public static void makeMustacheThread() {
+        mMustacheEffectForOtherThread = new MustacheEffectForOtherThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
+
+    }
+
+    public static void makeRabbitThread() {
+        mRabbitEffectForOtherThread = new RabbitEffectForOtherThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
+
+    }
+
+
 }
+

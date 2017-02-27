@@ -23,6 +23,7 @@ import com.boostcamp.android.facestroy.utill.Utill;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.pnikosis.materialishprogress.ProgressWheel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +58,7 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
     private TextView mOk, mPhoneNumber;
     private String mImagePath, mImageUrl;
     private MyInfo mInfo;
-
+    private ProgressWheel mProgress;
     private Uri mProfileUri;
 
     @Override
@@ -67,6 +68,7 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
         setContentView(R.layout.activity_my_info);
         mRealm = Realm.getDefaultInstance();
         mProfileImage = (CircleImageView) findViewById(R.id.profile_image);
+        mProgress=(ProgressWheel)findViewById(R.id.progress_wheel);
         mInfo = mRealm.where(MyInfo.class).findFirst();
 
         Glide.with(getApplicationContext())
@@ -153,6 +155,8 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
             Log.d(TAG, mProfileUri.toString());
 
             String url = "http://1-dot-boostcamp-jusung.appspot.com/upload";
+            mProgress.setVisibility(View.VISIBLE);
+            mProgress.setClickable(false);
             new UploadImageAsync().execute(url);
         }
     }
@@ -237,7 +241,7 @@ public class ModMyInfoActivity extends AppCompatActivity implements View.OnClick
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             mImageUrl = s;
+            mProgress.setVisibility(View.GONE);
         }
     }
-
 }

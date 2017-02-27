@@ -25,7 +25,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
         Map<String, String> data = remoteMessage.getData();
-        String effect = data.get("mEffect");
+        String effect = data.get("effect");
         String check = data.get("check");
         String point = data.get("point");
         Log.d(TAG, effect + "");
@@ -35,17 +35,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String channelId = data.get("channelId");
             String name = data.get("name");
             String phoneNumber = data.get("phoneNumber");
-            String token = data.get("token");
+            String token = data.get("sender");
             String sender = data.get("sender");
-            Log.d(TAG, channelId + " " + name + " " + phoneNumber + " ");
+
             intent.putExtra("channelId", channelId);
             intent.putExtra("name", name);
             intent.putExtra("phoneNumber", phoneNumber);
             intent.putExtra("token", token);
             intent.putExtra("sender", sender);
             PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(), 1000, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            //startActivity(intent);
 
             try {
                 pendingIntent.send();
@@ -72,30 +70,23 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void heartEffect(String check, String point) {
         if (check.equals("start")) {
             if (point.equals("sender")) {
-                if (ReceiveCallActivity.mHeartTreeEffectForOtherThread.getState() == Thread.State.NEW)
-                    ReceiveCallActivity.mHeartTreeEffectForOtherThread.start();
-                else if (ReceiveCallActivity.mHeartTreeEffectForOtherThread.getState() == Thread.State.TERMINATED) {
-                    //재생성
-                    ReceiveCallActivity.makeThread();
+                if (ReceiveCallActivity.mHeartTreeEffectForOtherThread!=null) {
                     ReceiveCallActivity.mHeartTreeEffectForOtherThread.start();
                 }
+
             } else {
                 // 수신
-                if (VideoCallActvity.mHeartTreeEffectForOtherThread.getState() == Thread.State.NEW)
+                if (VideoCallActvity.mHeartTreeEffectForOtherThread!=null) {
                     VideoCallActvity.mHeartTreeEffectForOtherThread.start();
-                else if (VideoCallActvity.mHeartTreeEffectForOtherThread.getState() == Thread.State.TERMINATED) {
-
+                    Log.d(TAG,"비디오콜");
                 }
             }
         } else {
             // 종료!!
             if (point.equals("sender")) {
-                ReceiveCallActivity.exitThread();
+                ReceiveCallActivity.exitOtherThread();
             } else {
-//                if (VideoCallActvity.mHeartTreeEffectForOtherThread.getState() == Thread.State.RUNNABLE) {
-//                    VideoCallActvity.mHeartTreeEffectForOtherThread.effectOff();
-//                    VideoCallActvity.mHeartTreeEffectForOtherThread.stopThread();
-//                }
+                VideoCallActvity.exitOtherThread();
             }
         }
     }
@@ -103,30 +94,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void mustacheEffect(String check, String point) {
         if (check.equals("start")) {
             if (point.equals("sender")) {
-                if (ReceiveCallActivity.mMustacheEffectForOtherThread.getState() == Thread.State.NEW)
+                if (ReceiveCallActivity.mMustacheEffectForOtherThread!=null)
                     ReceiveCallActivity.mMustacheEffectForOtherThread.start();
-                else if (ReceiveCallActivity.mMustacheEffectForOtherThread.getState() == Thread.State.TERMINATED) {
-                    //재생성
-                    ReceiveCallActivity.makeThread();
-                    ReceiveCallActivity.mMustacheEffectForOtherThread.start();
-                }
+
             } else {
                 // 수신
-                if (VideoCallActvity.mMustacheEffectForOtherThread.getState() == Thread.State.NEW)
-                    VideoCallActvity.mMustacheEffectForOtherThread.stopThread();
-                else if (VideoCallActvity.mMustacheEffectForOtherThread.getState() == Thread.State.TERMINATED) {
-
-                }
+                if (VideoCallActvity.mMustacheEffectForOtherThread!=null)
+                    VideoCallActvity.mMustacheEffectForOtherThread.start();
             }
         } else {
             // 종료!!
             if (point.equals("sender")) {
-                ReceiveCallActivity.exitThread();
+                ReceiveCallActivity.exitOtherThread();
             } else {
-//                    if (VideoCallActvity.mMustacheEffectForOtherThread.getState() == Thread.State.RUNNABLE) {
-//                        VideoCallActvity.mMustacheEffectForOtherThread.effectOff();
-//                        VideoCallActvity.mMustacheEffectForOtherThread.stopThread();
-//                    }
+                VideoCallActvity.exitOtherThread();
             }
         }
     }
@@ -134,30 +115,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void rabbitEffect(String check, String point) {
         if (check.equals("start")) {
             if (point.equals("sender")) {
-                if (ReceiveCallActivity.mRabbitEffectForOtherThread.getState() == Thread.State.NEW)
+                if (ReceiveCallActivity.mRabbitEffectForOtherThread!=null)
                     ReceiveCallActivity.mRabbitEffectForOtherThread.start();
-                else if (ReceiveCallActivity.mRabbitEffectForOtherThread.getState() == Thread.State.TERMINATED) {
-                    //재생성
-                    ReceiveCallActivity.makeThread();
-                    ReceiveCallActivity.mRabbitEffectForOtherThread.start();
-                }
+
             } else {
                 // 수신
-//                if (VideoCallActvity.mRabbitEffectForOtherThread.getState() == Thread.State.NEW)
-//                    VideoCallActvity.mRabbitEffectForOtherThread.stopThread();
-//                else if (VideoCallActvity.mRabbitEffectForOtherThread.getState() == Thread.State.TERMINATED) {
-//
-//                }
+                if (VideoCallActvity.mRabbitEffectForOtherThread!=null)
+                    VideoCallActvity.mRabbitEffectForOtherThread.start();
             }
         } else {
             // 종료!!
             if (point.equals("sender")) {
-                ReceiveCallActivity.exitThread();
+                ReceiveCallActivity.exitOtherThread();
             } else {
-//                    if (VideoCallActvity.mRabbitEffectForOtherThread!=null&&VideoCallActvity.mRabbitEffectForOtherThread.getState() == Thread.State.RUNNABLE) {
-//                        VideoCallActvity.mRabbitEffectForOtherThread.effectOff();
-//                        VideoCallActvity.mRabbitEffectForOtherThread.stopThread();
-//                    }
+                VideoCallActvity.exitOtherThread();
             }
         }
     }
