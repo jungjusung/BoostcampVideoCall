@@ -59,7 +59,8 @@ public class MustacheEffectForMeThread extends Thread {
         display.getSize(mPoint);
 
         localView.getLocationOnScreen(mLocation);
-        mEffect = new Effect(context, mLocation[0], mLocation[1], 150, 100);
+
+        mEffect = new Effect(context, 0, 0, 150, 100);
         mEffect.setVisibility(View.GONE);
         mFaceDetector = new
                 FaceDetector.Builder(context)
@@ -186,15 +187,12 @@ public class MustacheEffectForMeThread extends Thread {
     }
 
     public void stopThread() {
-        mBitmapQueue.clear();
         mThreadFlag = false;
         interrupt();
-
     }
 
     public void effectOff() {
         mEffect.setVisibility(View.GONE);
-        mEffect = null;
     }
 
     public boolean isRunning() {

@@ -52,6 +52,7 @@ public class MemberViewHolder extends RecyclerView.ViewHolder implements View.On
             case R.id.cv_image:
                 Intent detailIntent=new Intent(mContext, MemberDetailActivity.class);
                 detailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                detailIntent.putExtra("position",clickedPosition);
                 mContext.startActivity(detailIntent);
                 break;
         }

@@ -41,6 +41,7 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setTheme(R.style.myNoActionBar);
         setContentView(R.layout.activity_member_detail);
+        int currentPosition=getIntent().getIntExtra("position",0);
         mRealm = Realm.getDefaultInstance();
 
         mDetailViewPager = (ViewPager) findViewById(R.id.vp_detail);
@@ -52,9 +53,9 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
         mBtnNext.setOnClickListener(this);
         mBtnBackspace.setOnClickListener(this);
         mBtnBackspace.bringToFront();
-
         DetailAdapter detailAdapter = new DetailAdapter(getLayoutInflater());
         mDetailViewPager.setAdapter(detailAdapter);
+        mDetailViewPager.setCurrentItem(currentPosition);
 
     }
 
@@ -88,7 +89,6 @@ public class MemberDetailActivity extends AppCompatActivity implements View.OnCl
         public DetailAdapter(LayoutInflater mInflater) {
             this.mInflater = mInflater;
             list = mRealm.where(Member.class).findAll();
-            Log.d(TAG, "여기는??");
         }
 
         @Override

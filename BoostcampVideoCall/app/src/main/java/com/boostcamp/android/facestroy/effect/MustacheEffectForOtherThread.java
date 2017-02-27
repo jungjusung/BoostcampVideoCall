@@ -85,7 +85,7 @@ public class MustacheEffectForOtherThread extends Thread {
                 if (mRemoteView != null&&mThreadFlag) {
                     makeSanpshot();
                     detectSnapShot();
-                    sleep(30);
+                    sleep(50);
                 }
 
             } catch (InterruptedException e) {
@@ -171,16 +171,12 @@ public class MustacheEffectForOtherThread extends Thread {
     }
 
     public void stopThread() {
-        mBitmapQueue.clear();
-
         mThreadFlag = false;
         interrupt();
-
     }
 
     public void effectOff() {
         mEffect.setVisibility(View.GONE);
-        mEffect = null;
     }
 
 

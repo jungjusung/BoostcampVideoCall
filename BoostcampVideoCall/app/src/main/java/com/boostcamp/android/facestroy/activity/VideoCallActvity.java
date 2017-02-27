@@ -674,8 +674,8 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 @Override
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
-                    mMustacheEffectForOtherThread.effectOff();
                     mMustacheEffectForOtherThread.stopThread();
+                    mMustacheEffectForOtherThread.effectOff();
                     makeMustacheThread();
                 }
             }.execute();
@@ -684,6 +684,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
         if (mRabbitEffectForOtherThread != null) {
 
             new AsyncTask<Void, Void, Void>() {
+
                 @Override
                 protected Void doInBackground(Void... voids) {
                     return null;
@@ -692,8 +693,8 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 @Override
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
-                    mRabbitEffectForOtherThread.effectOff();
                     mRabbitEffectForOtherThread.stopThread();
+                    mRabbitEffectForOtherThread.effectOff();
                     makeRabbitThread();
                 }
             }.execute();
@@ -709,8 +710,8 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 @Override
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
-                    mHeartTreeEffectForOtherThread.effectOff();
                     mHeartTreeEffectForOtherThread.stopThread();
+                    mHeartTreeEffectForOtherThread.effectOff();
                     makeHeartThread();
                 }
             }.execute();

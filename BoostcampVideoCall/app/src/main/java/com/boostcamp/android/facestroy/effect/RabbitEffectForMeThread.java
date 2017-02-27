@@ -201,16 +201,12 @@ public class RabbitEffectForMeThread extends Thread {
     }
 
     public void stopThread() {
-        mBitmapQueue.clear();
-
         mThreadFlag = false;
         interrupt();
-
     }
 
     public void effectOff() {
         mEffect.setVisibility(View.GONE);
-        mEffect = null;
     }
 
     public boolean isRunning() {

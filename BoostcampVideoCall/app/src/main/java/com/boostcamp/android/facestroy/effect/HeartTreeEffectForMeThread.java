@@ -50,7 +50,7 @@ public class HeartTreeEffectForMeThread extends Thread {
     private int mLocation[] = new int[2];
     private Point mPoint;
 
-    public static Effect mEffect;
+    private Effect mEffect;
 
     public HeartTreeEffectForMeThread(PlayRTCVideoView localView, PlayRTCVideoView remoteView, Context context, RelativeLayout relativeLayout) {
         this.mLocalView = localView;
@@ -197,15 +197,12 @@ public class HeartTreeEffectForMeThread extends Thread {
     }
 
     public void stopThread() {
-        mBitmapQueue.clear();
         mThreadFlag = false;
         interrupt();
-
     }
 
     public void effectOff() {
         mEffect.setVisibility(View.GONE);
-        mEffect = null;
     }
 
     public boolean isRunning() {

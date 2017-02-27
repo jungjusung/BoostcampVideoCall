@@ -193,10 +193,6 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                 mMyVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
 
                 if (mReceiveLocalView != null) {
-
-                    mHeartTreeEffectForMeThread = new HeartTreeEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
-                    mMustacheEffectForMeThread = new MustacheEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
-                    mRabbitEffectForMeThread = new RabbitEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
                     makeHeartThread();
                     makeMustacheThread();
                     makeRabbitThread();
@@ -305,8 +301,6 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        exitThread();
-        exitOtherThread();
         mReceiveLocalView = null;
         mReceiveRemoteView = null;
 
@@ -453,7 +447,6 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
 
             mMustacheEffectForMeThread.stopThread();
             mMustacheEffectForMeThread.effectOff();
-
             mMustacheEffectForMeThread = new MustacheEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
             new SenderAsync().execute(url, mToken, effect, sender, check, point);
         }
@@ -463,7 +456,6 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
             check = "end";
             mRabbitEffectForMeThread.stopThread();
             mRabbitEffectForMeThread.effectOff();
-
             mRabbitEffectForMeThread = new RabbitEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
             new SenderAsync().execute(url, mToken, effect, sender, check, point);
         }
