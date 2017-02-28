@@ -72,7 +72,7 @@ public class RabbitEffectForOtherThread extends Thread {
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onSnapshotImage(Bitmap image) {
-                if (image != null && mRemoteView != null && mThreadFlag) {
+                if (image != null && mRemoteView != null && mThreadFlag&&mLayout!=null) {
                     mBitmapQueue.add(image);
                 }
             }
@@ -101,14 +101,14 @@ public class RabbitEffectForOtherThread extends Thread {
         }
     }
 
-    public synchronized void makeSanpshot() {
+    public void makeSanpshot() {
         if (mRemoteView != null && mSnapShot != null && mThreadFlag) {
             mRemoteView.snapshot(mSnapShot);
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public synchronized void detectSnapShot() {
+    public void detectSnapShot() {
 
         if (mBitmapQueue.size() == 0)
             return;
@@ -177,12 +177,16 @@ public class RabbitEffectForOtherThread extends Thread {
             }
         }
     }
-
     public void stopThread() {
+
         mThreadFlag = false;
+        try {
+            this.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         interrupt();
     }
-
     public void effectOff() {
         mEffect.setVisibility(View.GONE);
     }

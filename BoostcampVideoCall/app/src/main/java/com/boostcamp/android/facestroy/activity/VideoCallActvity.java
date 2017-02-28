@@ -676,7 +676,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                     super.onPostExecute(aVoid);
                     mMustacheEffectForOtherThread.stopThread();
                     mMustacheEffectForOtherThread.effectOff();
-                    makeMustacheThread();
+                   // makeMustacheThread();
                 }
             }.execute();
 
@@ -695,7 +695,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                     super.onPostExecute(aVoid);
                     mRabbitEffectForOtherThread.stopThread();
                     mRabbitEffectForOtherThread.effectOff();
-                    makeRabbitThread();
+                    //makeRabbitThread();
                 }
             }.execute();
 
@@ -712,7 +712,7 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                     super.onPostExecute(aVoid);
                     mHeartTreeEffectForOtherThread.stopThread();
                     mHeartTreeEffectForOtherThread.effectOff();
-                    makeHeartThread();
+                    //makeHeartThread();
                 }
             }.execute();
 

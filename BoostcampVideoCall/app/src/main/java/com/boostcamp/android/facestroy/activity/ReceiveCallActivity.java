@@ -89,6 +89,7 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
         mAfterLayout = (RelativeLayout) findViewById(R.id.video_view_group);
 
         mEffectButton = (RelativeLayout) findViewById(R.id.effect_button);
+        mMenuButton.bringToFront();
         mEffectButton.bringToFront();
 
         mBtnEffect = (LinearLayout) findViewById(R.id.btn_effect);
@@ -188,16 +189,20 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
 
             @Override
             public void onAddRemoteStream(PlayRTC playRTC, String s, String s1, PlayRTCMedia playRTCMedia) {
-                long delayTime = 0;
-                mReceiveRemoteView.show(delayTime);
-                mMyVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
+
 
                 if (mReceiveLocalView != null) {
+                    long delayTime = 0;
+                    mReceiveRemoteView.show(delayTime);
+                    mMyVideoViewGroup = (RelativeLayout) findViewById(R.id.video_view_group);
+                    mHeartTreeEffectForMeThread = new HeartTreeEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
+                    mMustacheEffectForMeThread = new MustacheEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
+                    mRabbitEffectForMeThread = new RabbitEffectForMeThread(mReceiveLocalView, mReceiveRemoteView, mContext, mMyVideoViewGroup);
                     makeHeartThread();
                     makeMustacheThread();
                     makeRabbitThread();
+                    playRTCMedia.setVideoRenderer(mReceiveRemoteView.getVideoRenderer());
                 }
-                playRTCMedia.setVideoRenderer(mReceiveRemoteView.getVideoRenderer());
             }
 
             @Override
@@ -509,6 +514,7 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                     mRabbitEffectForOtherThread.effectOff();
                     mRabbitEffectForOtherThread.stopThread();
                     makeRabbitThread();
+
                 }
             }.execute();
 
@@ -525,7 +531,7 @@ public class ReceiveCallActivity extends AppCompatActivity implements View.OnTou
                     super.onPostExecute(aVoid);
                     mHeartTreeEffectForOtherThread.effectOff();
                     mHeartTreeEffectForOtherThread.stopThread();
-                    makeHeartThread();
+                   makeHeartThread();
                 }
             }.execute();
 
