@@ -71,14 +71,23 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (check.equals("start")) {
             if (point.equals("sender")) {
                 if (ReceiveCallActivity.mHeartTreeEffectForOtherThread!=null) {
-                    ReceiveCallActivity.mHeartTreeEffectForOtherThread.start();
+                    if(ReceiveCallActivity.mHeartTreeEffectForOtherThread.isRunning())
+                        ReceiveCallActivity.mHeartTreeEffectForOtherThread.start();
+                    else{
+                        ReceiveCallActivity.mHeartTreeEffectForOtherThread.effectOn();
+                        ReceiveCallActivity.mHeartTreeEffectForOtherThread.restartThread();
+                    }
                 }
 
             } else {
                 // 수신
                 if (VideoCallActvity.mHeartTreeEffectForOtherThread!=null) {
-                    VideoCallActvity.mHeartTreeEffectForOtherThread.start();
-                    Log.d(TAG,"비디오콜");
+                    if(VideoCallActvity.mHeartTreeEffectForOtherThread.isRunning())
+                        VideoCallActvity.mHeartTreeEffectForOtherThread.start();
+                    else{
+                        VideoCallActvity.mHeartTreeEffectForOtherThread.effectOn();
+                        VideoCallActvity.mHeartTreeEffectForOtherThread.restartThread();
+                    }
                 }
             }
         } else {
@@ -95,12 +104,22 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (check.equals("start")) {
             if (point.equals("sender")) {
                 if (ReceiveCallActivity.mMustacheEffectForOtherThread!=null)
-                    ReceiveCallActivity.mMustacheEffectForOtherThread.start();
+                    if(ReceiveCallActivity.mMustacheEffectForOtherThread.isRunning())
+                        ReceiveCallActivity.mMustacheEffectForOtherThread.start();
+                    else{
+                        ReceiveCallActivity.mMustacheEffectForOtherThread.effectOn();
+                        ReceiveCallActivity.mMustacheEffectForOtherThread.restartThread();
+                    }
 
             } else {
                 // 수신
                 if (VideoCallActvity.mMustacheEffectForOtherThread!=null)
-                    VideoCallActvity.mMustacheEffectForOtherThread.start();
+                    if(VideoCallActvity.mMustacheEffectForOtherThread.isRunning())
+                        VideoCallActvity.mMustacheEffectForOtherThread.start();
+                    else{
+                        VideoCallActvity.mMustacheEffectForOtherThread.effectOn();
+                        VideoCallActvity.mMustacheEffectForOtherThread.restartThread();
+                    }
             }
         } else {
             // 종료!!
@@ -116,12 +135,22 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (check.equals("start")) {
             if (point.equals("sender")) {
                 if (ReceiveCallActivity.mRabbitEffectForOtherThread!=null)
-                    ReceiveCallActivity.mRabbitEffectForOtherThread.start();
+                    if(ReceiveCallActivity.mRabbitEffectForOtherThread.isRunning())
+                        ReceiveCallActivity.mRabbitEffectForOtherThread.start();
+                    else{
+                        ReceiveCallActivity.mRabbitEffectForOtherThread.effectOn();
+                        ReceiveCallActivity.mRabbitEffectForOtherThread.restartThread();
+                    }
 
             } else {
                 // 수신
                 if (VideoCallActvity.mRabbitEffectForOtherThread!=null)
-                    VideoCallActvity.mRabbitEffectForOtherThread.start();
+                    if(VideoCallActvity.mRabbitEffectForOtherThread.isRunning())
+                        VideoCallActvity.mRabbitEffectForOtherThread.start();
+                    else{
+                        VideoCallActvity.mRabbitEffectForOtherThread.effectOn();
+                        VideoCallActvity.mRabbitEffectForOtherThread.restartThread();
+                    }
             }
         } else {
             // 종료!!

@@ -40,13 +40,13 @@ public class MemberAdapter extends RealmRecyclerViewAdapter<Member,MemberViewHol
     public MemberViewHolder onCreateViewHolder(final ViewGroup viewGroup, final int viewType) {
         final View view = LayoutInflater.from(context).inflate(com.boostcamp.android.facestroy.R.layout.item_rv_content, viewGroup, false);
         MemberViewHolder holder = new MemberViewHolder(view,context,mOnClickListener);
-
         return holder;
     }
 
     @Override
     public void onBindViewHolder(final MemberViewHolder holder, final int position) {
         holder.bind(position);
+        
     }
 
     @Override

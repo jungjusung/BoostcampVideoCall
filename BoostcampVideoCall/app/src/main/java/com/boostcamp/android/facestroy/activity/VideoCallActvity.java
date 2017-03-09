@@ -488,9 +488,13 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 if (mHeartTreeEffectForMeThread != null) {
                     effect = "heart";
                     check = "start";
-                    mHeartTreeEffectForMeThread.start();
+                    if(mHeartTreeEffectForMeThread.isRunning())
+                        mHeartTreeEffectForMeThread.start();
+                    else {
+                        mHeartTreeEffectForMeThread.effectOn();
+                        mHeartTreeEffectForMeThread.restartThread();
+                    }
                     new SenderAsync().execute(url, mToken, effect, sender, check, point);
-
                 }
 
                 btnSetEnabled(Constant.EFFECT_TREEHEART);
@@ -500,7 +504,12 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 if (mMustacheEffectForMeThread != null) {
                     effect = "mustache";
                     check = "start";
-                    mMustacheEffectForMeThread.start();
+                    if(mMustacheEffectForMeThread.isRunning())
+                        mMustacheEffectForMeThread.start();
+                    else {
+                        mMustacheEffectForMeThread.effectOn();
+                        mMustacheEffectForMeThread.restartThread();
+                    }
                     new SenderAsync().execute(url, mToken, effect, sender, check, point);
                     btnSetEnabled(Constant.EFFECT_MUSTACHE);
                 }
@@ -509,7 +518,12 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                 if (mRabbitEffectForMeThread != null) {
                     effect = "rabbit";
                     check = "start";
-                    mRabbitEffectForMeThread.start();
+                    if(mRabbitEffectForMeThread.isRunning())
+                        mRabbitEffectForMeThread.start();
+                    else {
+                        mRabbitEffectForMeThread.effectOn();
+                        mRabbitEffectForMeThread.restartThread();
+                    }
                     new SenderAsync().execute(url, mToken, effect, sender, check, point);
                     btnSetEnabled(Constant.EFFECT_RABBIT);
                 }
@@ -610,7 +624,6 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             mHeartTreeEffectForMeThread.stopThread();
             mHeartTreeEffectForMeThread.effectOff();
 
-            mHeartTreeEffectForMeThread = new HeartTreeEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
             new SenderAsync().execute(url, mToken, effect, sender, check, point);
         }
         if (mMustacheEffectForMeThread != null) {
@@ -619,7 +632,6 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
 
             mMustacheEffectForMeThread.stopThread();
             mMustacheEffectForMeThread.effectOff();
-            mMustacheEffectForMeThread = new MustacheEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
             new SenderAsync().execute(url, mToken, effect, sender, check, point);
         }
 
@@ -628,7 +640,6 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
             check = "end";
             mRabbitEffectForMeThread.stopThread();
             mRabbitEffectForMeThread.effectOff();
-            mRabbitEffectForMeThread = new RabbitEffectForMeThread(mLocalView, mRemoteView, mContext, mMyVideoViewGroup);
             new SenderAsync().execute(url, mToken, effect, sender, check, point);
         }
 
@@ -676,7 +687,6 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                     super.onPostExecute(aVoid);
                     mMustacheEffectForOtherThread.stopThread();
                     mMustacheEffectForOtherThread.effectOff();
-                   // makeMustacheThread();
                 }
             }.execute();
 
@@ -695,7 +705,6 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                     super.onPostExecute(aVoid);
                     mRabbitEffectForOtherThread.stopThread();
                     mRabbitEffectForOtherThread.effectOff();
-                    //makeRabbitThread();
                 }
             }.execute();
 
@@ -712,7 +721,6 @@ public class VideoCallActvity extends AppCompatActivity implements View.OnClickL
                     super.onPostExecute(aVoid);
                     mHeartTreeEffectForOtherThread.stopThread();
                     mHeartTreeEffectForOtherThread.effectOff();
-                    //makeHeartThread();
                 }
             }.execute();
 

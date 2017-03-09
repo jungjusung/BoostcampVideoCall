@@ -39,6 +39,7 @@ public class RabbitEffectForMeThread extends Thread {
     private Bitmap mBitmap;
     private Context mContext;
     private boolean mThreadFlag = true;
+    private boolean mRestartFlag = true;
     private FaceDetector mFaceDetector;
     private Detector<Face> mSafeDetector;
     private Queue<Bitmap> mBitmapQueue = new LinkedList<>();
@@ -105,17 +106,19 @@ public class RabbitEffectForMeThread extends Thread {
     @Override
     public void run() {
         while (mThreadFlag) {
-            try {
-                if (mLocalView != null&&mThreadFlag) {
-                    makeSanpshot();
-                    detectSnapShot();
-                    sleep(50);
+            if (mRestartFlag) {
+                try {
+                    if (mLocalView != null && mThreadFlag) {
+                        makeSanpshot();
+                        detectSnapShot();
+                        sleep(50);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } else {
+                Thread.yield();
             }
-
         }
     }
 
@@ -201,13 +204,11 @@ public class RabbitEffectForMeThread extends Thread {
     }
 
     public void stopThread() {
-
-        mThreadFlag = false;
-        try {
-            this.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        mRestartFlag = false;
+        interrupt();
+    }
+    public void restartThread() {
+        mRestartFlag = true;
         interrupt();
     }
 
@@ -216,17 +217,14 @@ public class RabbitEffectForMeThread extends Thread {
     }
 
     public boolean isRunning() {
-        return mThreadFlag;
+        return mRestartFlag;
     }
 
     public void effectOn() {
         mEffect.setVisibility(View.VISIBLE);
     }
 
-    public void restartThread() {
-        mThreadFlag = true;
-        interrupt();
-    }
+
 }
 
 
